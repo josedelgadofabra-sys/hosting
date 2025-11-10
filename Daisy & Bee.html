@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Daisy & Bee - Tienda Completa</title>
+  <style>
+    :root{
+      --main:#ff7eb9;
+      --accent:#ffd166;
+      --dark:#222;
+      --muted:#666;
+      --bg:#fff9f5;
+      --card:#fff;
+    }
+    *{box-sizing:border-box;font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;}
+    body{background:var(--bg);margin:0;color:var(--dark);-webkit-font-smoothing:antialiased;}
+    .container{width:94%;max-width:1200px;margin:0 auto;padding:18px;}
+    header{background:var(--card);padding:12px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06);position:sticky;top:0;z-index:50;}
+    .header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+    .brand{display:flex;align-items:center;gap:10px}
+    .brand img{height:36px;width:36px;border-radius:50%;object-fit:cover}
+    .brand .logo-icon{font-size:22px;color:var(--accent)}
+    .brand h1{font-size:20px;color:var(--main);margin:0}
+    nav ul{display:flex;gap:12px;list-style:none;margin:0;padding:0;align-items:center}
+    nav a{padding:8px 10px;border-radius:8px;text-decoration:none;color:var(--dark);font-weight:600;transition:all 0.3s ease}
+    nav a.active, nav a:hover{background:rgba(255,126,185,0.12);color:var(--main)}
+    .search{display:flex;align-items:center;gap:8px;background:#fff;padding:6px;border-radius:20px;border:1px solid #eee;transition:all 0.3s ease}
+    .search:focus-within{box-shadow:0 0 0 2px rgba(255,126,185,0.2)}
+    .search input{border:0;outline:0;width:160px}
+    .icons{display:flex;align-items:center;gap:12px;position:relative}
+    .cart-badge{position:absolute;top:-6px;right:-6px;background:var(--main);color:#fff;border-radius:50%;width:18px;height:18px;display:flex;align-items:center;justify-content:center;font-size:12px;transition:all 0.3s ease}
+    /* layout */
+    .hero{background:linear-gradient(90deg, rgba(255,126,185,0.06), rgba(255,209,102,0.03));border-radius:12px;padding:28px;margin:18px 0;display:flex;gap:20px;align-items:center;transition:all 0.5s ease}
+    .hero:hover{transform:translateY(-5px);box-shadow:0 10px 20px rgba(0,0,0,0.05)}
+    .hero .title{font-size:26px;color:var(--dark);font-weight:700}
+    .hero .cta{background:var(--main);color:#fff;padding:10px 16px;border-radius:12px;border:0;cursor:pointer;transition:all 0.3s ease}
+    .hero .cta:hover{background:#ff5aa7;transform:scale(1.05)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin-top:18px}
+    .card{background:var(--card);border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(0,0,0,0.05);display:flex;flex-direction:column;gap:8px;transition:all 0.4s ease;position:relative;overflow:hidden}
+    .card:hover{transform:translateY(-8px);box-shadow:0 12px 24px rgba(0,0,0,0.1)}
+    .card img{width:100%;height:160px;object-fit:cover;border-radius:8px;transition:all 0.4s ease}
+    .card:hover img{transform:scale(1.05)}
+    .card h3{margin:0;font-size:16px}
+    .card p{margin:0;color:var(--muted);font-size:13px}
+    .price{font-weight:800;color:var(--main);font-size:16px}
+    .btn{background:var(--main);color:#fff;border:0;padding:9px;border-radius:10px;cursor:pointer;font-weight:700;transition:all 0.3s ease}
+    .btn:hover{background:#ff5aa7;transform:translateY(-2px);box-shadow:0 4px 8px rgba(255,126,185,0.3)}
+    .btn.secondary{background:#fff;border:1px solid #eee;color:var(--dark);transition:all 0.3s ease}
+    .btn.secondary:hover{background:#f5f5f5;transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.1)}
+    .pages{min-height:360px;margin-bottom:36px}
+    /* carrito y checkout */
+    .cart-panel{position:fixed;right:18px;bottom:18px;background:var(--card);width:360px;max-width:95%;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,0.12);overflow:hidden;display:none;flex-direction:column;z-index:60;transition:all 0.4s ease}
+    .cart-header{display:flex;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #f0f0f0}
+    .cart-items{max-height:300px;overflow:auto;padding:10px;display:flex;flex-direction:column;gap:10px}
+    .cart-item{display:flex;gap:10px;align-items:center;transition:all 0.3s ease}
+    .cart-item:hover{background:#f9f9f9;border-radius:8px;padding:5px}
+    .cart-item .thumb{width:64px;height:64px;border-radius:8px;object-fit:cover;background:#f7f7f7;transition:all 0.3s ease}
+    .cart-item:hover .thumb{transform:scale(1.1)}
+    .cart-item .meta{flex:1}
+    .cart-item .meta h4{margin:0;font-size:14px}
+    .cart-item .meta small{color:var(--muted)}
+    .cart-controls{display:flex;align-items:center;gap:6px;margin-top:6px}
+    .qty{display:flex;align-items:center;border-radius:8px;overflow:hidden;border:1px solid #eee}
+    .qty button{background:#fff;border:0;padding:6px 8px;cursor:pointer;transition:all 0.2s ease}
+    .qty button:hover{background:#f0f0f0}
+    .qty input{width:36px;text-align:center;border:0}
+    .cart-footer{padding:12px 14px;border-top:1px solid #f0f0f0;display:flex;flex-direction:column;gap:8px}
+    .total-row{display:flex;justify-content:space-between;font-weight:700}
+    /* form */
+    .form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+    input[type="text"],input[type="email"],select,textarea{padding:10px;border-radius:8px;border:1px solid #eee;outline:none;transition:all 0.3s ease}
+    input[type="text"]:focus,input[type="email"]:focus,select:focus,textarea:focus{border-color:var(--main);box-shadow:0 0 0 2px rgba(255,126,185,0.2)}
+    .small{font-size:13px;color:var(--muted)}
+    .review-box{margin-top:20px}
+    .review{background:#fff;border-radius:10px;padding:10px;margin-top:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);transition:all 0.3s ease}
+    .review:hover{transform:translateY(-3px);box-shadow:0 4px 12px rgba(0,0,0,0.08)}
+    /* responsive */
+    @media (max-width:700px){
+      nav ul{display:none}
+      .search input{width:90px}
+      .hero{flex-direction:column;align-items:flex-start}
+    }
+    footer{padding:20px;border-top:1px solid #eee;margin-top:30px;text-align:center;color:var(--muted)}
+    
+    /* Sale badge */
+    .sale-badge{position:absolute;top:10px;right:10px;background:var(--accent);color:var(--dark);padding:4px 8px;border-radius:6px;font-size:12px;font-weight:700;z-index:1}
+    
+    /* Page transitions */
+    .page{transition:opacity 0.3s ease, transform 0.3s ease}
+    .page:not([style*="display: none"]){animation:fadeIn 0.4s ease forwards}
+    @keyframes fadeIn{
+      from{opacity:0; transform:translateY(10px)}
+      to{opacity:1; transform:translateY(0)}
+    }
+    
+    /* Cart panel animation */
+    .cart-panel[aria-hidden="false"]{animation:slideInUp 0.4s ease forwards}
+    @keyframes slideInUp{
+      from{transform:translateY(100%); opacity:0}
+      to{transform:translateY(0); opacity:1}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container header-inner">
+      <div class="brand">
+        <!-- si no tienes logo, se usa emoji -->
+        <img id="brandLogo" src="49af961a-0543-495b-b7b3-185e32404cf9.png" alt="logo" onerror="this.style.display='none'">
+        <div class="logo-icon" style="display:none">🌼</div>
+        <h1>Daisy & Bee</h1>
+      </div>
+
+      <nav>
+        <ul id="navList">
+          <li><a href="#" data-page="home" class="nav-link active">Inicio</a></li>
+          <li><a href="#" data-page="productos" class="nav-link">Productos</a></li>
+          <li><a href="#" data-page="accesorios" class="nav-link">Accesorios</a></li>
+          <li><a href="#" data-page="maquillajes" class="nav-link">Maquillajes</a></li>
+          <li><a href="#" data-page="ofertas" class="nav-link">Ofertas</a></li>
+          <li><a href="#" data-page="reviews" class="nav-link">Reseñas</a></li>
+          <li><a href="#" data-page="cuenta" class="nav-link">Cuenta</a></li>
+        </ul>
+      </nav>
+
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="search">
+          <input id="searchInput" placeholder="Buscar..." />
+          <button class="btn secondary" id="searchBtn">Buscar</button>
+        </div>
+
+        <div class="icons">
+          <button class="btn secondary" id="openCartBtn" aria-label="Abrir carrito">🛒</button>
+          <div class="cart-badge" id="cartCount">0</div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="appPages" class="pages">
+      <!-- Home -->
+      <div id="page-home" class="page">
+        <div class="hero">
+          <div>
+            <div class="title">Bienvenida a Daisy & Bee</div>
+            <div class="small" style="margin-top:8px;color:var(--muted)">Encuentra accesorios y maquillaje de calidad</div>
+            <div style="margin-top:12px"><button class="cta btn" onclick="navigate('productos')">Ver Productos</button></div>
+          </div>
+          <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9" alt="" style="height:120px;border-radius:12px;object-fit:cover;margin-left:auto">
+        </div>
+
+        <h2>Novedades</h2>
+        <div class="grid" id="homeProducts"></div>
+
+        <div class="review-box">
+          <h3>💬 Reseñas de la tienda</h3>
+          <form id="homeReviewForm">
+            <input id="homeUser" placeholder="Tu nombre" required>
+            <textarea id="homeComment" rows="3" placeholder="Escribe tu reseña..." required></textarea>
+            <button type="submit" class="btn">Enviar Reseña</button>
+          </form>
+          <div id="homeReviewsList"></div>
+        </div>
+      </div>
+
+      <!-- Productos -->
+      <div id="page-productos" class="page" style="display:none">
+        <h2>Productos</h2>
+        <div style="margin:8px 0" class="small">Todos los productos</div>
+        <div class="grid" id="productsGrid"></div>
+      </div>
+
+      <!-- Accesorios -->
+      <div id="page-accesorios" class="page" style="display:none">
+        <h2>Accesorios</h2>
+        <div class="grid" id="accesoriosGrid"></div>
+      </div>
+
+      <!-- Maquillajes -->
+      <div id="page-maquillajes" class="page" style="display:none">
+        <h2>Maquillajes</h2>
+        <div class="grid" id="maquillajesGrid"></div>
+      </div>
+
+      <!-- Ofertas -->
+      <div id="page-ofertas" class="page" style="display:none">
+        <h2>Ofertas</h2>
+        <div class="grid" id="ofertasGrid"></div>
+      </div>
+
+      <!-- Reviews page -->
+      <div id="page-reviews" class="page" style="display:none">
+        <h2>Reseñas de la Tienda</h2>
+        <div id="allReviewsList"></div>
+      </div>
+
+      <!-- Cuenta -->
+      <div id="page-cuenta" class="page" style="display:none">
+        <h2>Tu Cuenta</h2>
+        <div class="card" style="padding:16px">
+          <form id="registerForm">
+            <h3>Registrarse</h3>
+            <input id="regName" placeholder="Nombre" required>
+            <input id="regEmail" type="email" placeholder="Correo" required>
+            <input id="regPass" type="password" placeholder="Contraseña" required>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button type="submit" class="btn">Crear cuenta</button>
+              <button type="button" id="googleBtn" class="btn secondary">Entrar con Google</button>
+              <button type="button" id="gmailBtn" class="btn secondary">Entrar con Gmail</button>
+            </div>
+          </form>
+
+          <form id="loginForm" style="margin-top:20px">
+            <h3>Iniciar Sesión</h3>
+            <input id="logEmail" type="email" placeholder="Correo" required>
+            <input id="logPass" type="password" placeholder="Contraseña" required>
+            <button type="submit" class="btn" style="margin-top:8px">Entrar</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Contacto (simple) -->
+      <div id="page-contacto" class="page" style="display:none">
+        <h2>Contacto</h2>
+        <p class="small">¿Tienes dudas? Escríbenos.</p>
+        <form id="contactForm" style="max-width:600px;margin-top:12px">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" id="contactName" required>
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="contactEmail" required>
+          </div>
+          <div class="form-group">
+            <label>Mensaje</label>
+            <textarea id="contactMessage" rows="5"></textarea>
+          </div>
+          <button type="submit" class="btn">Enviar</button>
+        </form>
+      </div>
+    </section>
+
+    <footer>
+      © <span id="year"></span> Daisy & Bee • Hecho con ❤️ — Prototipo
+    </footer>
+  </main>
+
+  <!-- Carrito / Checkout Panel -->
+  <div class="cart-panel" id="cartPanel" aria-hidden="true">
+    <div class="cart-header">
+      <strong>Tu Carrito</strong>
+      <div>
+        <button class="btn secondary" id="closeCartBtn">Cerrar</button>
+      </div>
+    </div>
+
+    <div class="cart-items" id="cartItemsList"></div>
+
+    <div class="cart-footer" id="cartFooter">
+      <div class="total-row"><div>Subtotal</div><div id="cartSubtotal">$0.00</div></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn secondary" id="continueShopping">Seguir Comprando</button>
+        <button class="btn" id="proceedCheckout">Ir a Pagar</button>
+      </div>
+    </div>
+
+    <div id="checkoutArea" style="display:none;padding:12px;border-top:1px solid #f0f0f0;background:linear-gradient(0deg,#fff,rgba(255,255,255,0.9))">
+      <h3>Checkout</h3>
+      <form id="checkoutForm" style="display:flex;flex-direction:column;gap:8px">
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" id="cfName" required>
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="cfEmail" required>
+        </div>
+        <div class="form-group">
+          <label>Dirección</label>
+          <input type="text" id="cfAddress" required>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button type="button" class="btn secondary" id="backToCart">Volver</button>
+          <button type="submit" class="btn">Confirmar Compra</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="orderConfirmationArea" style="display:none;padding:12px;border-top:1px solid #f0f0f0;background:#fff">
+      <h3>¡Pedido confirmado!</h3>
+      <p class="small" id="orderSummaryText"></p>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" id="finishBtn">Seguir Comprando</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ====== Datos de productos ======
+    const PRODUCTS = [
+      { id: 'p1', title: 'Paleta de Sombras Daisy', price: 24.99, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2', stock: 10, featured:true },
+      { id: 'p2', title: 'Set de Brochas Bee', price: 39.99, category: 'accesorios', img: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad', stock: 8, featured:true },
+      { id: 'p3', title: 'Labial Líquido Mate', price: 14.99, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9', stock: 20 },
+      { id: 'p4', title: 'Espejo LED Compacto', price: 29.99, category: 'accesorios', img: 'https://images.unsplash.com/photo-1601582581083-1b1f3d7b4b6f', stock: 6 },
+      { id: 'p5', title: 'Esponjas Blender (x3)', price: 9.99, category: 'accesorios', img: 'https://images.unsplash.com/photo-1596461404969-dace20f7fdd6', stock: 15, onSale:true, salePrice:7.99 },
+      { id: 'p6', title: 'Rubor en Polvo', price: 19.50, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1526045612212-70caf35c14df', stock: 12 },
+      // Nuevos productos
+      { id: 'p7', title: 'Base Líquida de Larga Duración', price: 32.99, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b', stock: 14 },
+      { id: 'p8', title: 'Máscara de Pestañas Volumen X10', price: 18.50, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348', stock: 22 },
+      { id: 'p9', title: 'Corrector en Barra Alta Cobertura', price: 15.99, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1629196914375-9e3c6bf25ef4', stock: 18 },
+      { id: 'p10', title: 'Polvo Compacto Translúcido', price: 22.50, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1629196914375-9e3c6bf25ef4', stock: 16 },
+      { id: 'p11', title: 'Iluminador Líquido Brillante', price: 26.99, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b', stock: 12, onSale:true, salePrice:21.99 },
+      { id: 'p12', title: 'Estuche de Maquillaje Daisy', price: 45.99, category: 'accesorios', img: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883', stock: 7 },
+      { id: 'p13', title: 'Organizador de Brochas', price: 29.99, category: 'accesorios', img: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883', stock: 9 },
+      { id: 'p14', title: 'Limpiador de Esponjas', price: 12.99, category: 'accesorios', img: 'https://images.unsplash.com/photo-1596461404969-dace20f7fdd6', stock: 20 },
+      { id: 'p15', title: 'Rizador de Pestañas Profesional', price: 16.50, category: 'accesorios', img: 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad', stock: 15 },
+      { id: 'p16', title: 'Kit de Viaje Maquillaje', price: 59.99, category: 'accesorios', img: 'https://images.unsplash.com/photo-1556228578-8c89e6adf883', stock: 5, onSale:true, salePrice:49.99 },
+      { id: 'p17', title: 'Delineador Líquido Negro Intenso', price: 13.99, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348', stock: 25 },
+      { id: 'p18', title: 'Sombras Líquidas Metálicas', price: 18.99, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2', stock: 13 },
+      { id: 'p19', title: 'Perfilador de Cejas', price: 11.50, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1629196914375-9e3c6bf25ef4', stock: 19 },
+      { id: 'p20', title: 'Fijador de Maquillaje en Spray', price: 21.99, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1571781926291-c477ebfd024b', stock: 11 }
+    ];
+
+    // ====== Carrito (persistente con localStorage) ======
+    let CART = JSON.parse(localStorage.getItem('daisybee_cart') || '[]');
+
+    // util
+    function money(v){ return '$' + Number(v).toFixed(2); }
+    function saveCart(){ localStorage.setItem('daisybee_cart', JSON.stringify(CART)); updateCartUI(); }
+
+    function findProduct(id){ return PRODUCTS.find(p => p.id === id); }
+
+    // ====== Render ======
+    function renderGrid(containerId, filterFn){
+      const el = document.getElementById(containerId);
+      if(!el) return;
+      el.innerHTML = '';
+      const items = PRODUCTS.filter(filterFn);
+      items.forEach(p => {
+        const priceHtml = p.onSale ? `<div class="price"><s>${money(p.price)}</s> ${money(p.salePrice)}</div>` : `<div class="price">${money(p.price)}</div>`;
+        const saleBadge = p.onSale ? '<div class="sale-badge">OFERTA</div>' : '';
+        el.innerHTML += `
+          <div class="card">
+            ${saleBadge}
+            <img src="${p.img}?w=800&q=60" alt="${escapeHtml(p.title)}">
+            <h3>${escapeHtml(p.title)}</h3>
+            <p class="small">${escapeHtml(p.category)}</p>
+            ${priceHtml}
+            <div style="display:flex;gap:8px;margin-top:auto">
+              <button class="btn add-to-cart" data-id="${p.id}">Agregar</button>
+              <button class="btn secondary view-product" data-id="${p.id}">Ver</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function escapeHtml(str){ return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
+
+    function initViews(){
+      renderGrid('homeProducts', p => p.featured || false);
+      renderGrid('productsGrid', _ => true);
+      renderGrid('accesoriosGrid', p => p.category === 'accesorios');
+      renderGrid('maquillajesGrid', p => p.category === 'maquillajes');
+      renderGrid('ofertasGrid', p => p.onSale === true);
+      document.getElementById('year').textContent = new Date().getFullYear();
+      renderHomeReviews();
+      updateAllReviewsList();
+      updateCartUI();
+    }
+
+    // ====== Navegación SPA simple ======
+    function navigate(page){
+      document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+      const el = document.getElementById('page-' + page);
+      if(el) el.style.display = 'block';
+      document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
+      const nav = document.querySelector('.nav-link[data-page="'+page+'"]');
+      if(nav) nav.classList.add('active');
+      window.scrollTo(0,0);
+    }
+
+    document.querySelectorAll('.nav-link').forEach(a => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigate(a.dataset.page);
+      });
+    });
+
+    // ====== Búsqueda simple ======
+    document.getElementById('searchBtn').addEventListener('click', () => {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      if(!q) return navigate('productos');
+      const results = PRODUCTS.filter(p => p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
+      const container = document.getElementById('productsGrid');
+      container.innerHTML = '';
+      if(results.length === 0){ container.innerHTML = '<div class="small">No encontramos resultados.</div>'; return navigate('productos'); }
+      results.forEach(p => {
+        const saleBadge = p.onSale ? '<div class="sale-badge">OFERTA</div>' : '';
+        container.innerHTML += `
+          <div class="card">
+            ${saleBadge}
+            <img src="${p.img}?w=800&q=60" alt="${escapeHtml(p.title)}">
+            <h3>${escapeHtml(p.title)}</h3>
+            <p class="small">${escapeHtml(p.category)}</p>
+            <div class="price">${money(p.onSale ? p.salePrice : p.price)}</div>
+            <div style="display:flex;gap:8px;margin-top:auto">
+              <button class="btn add-to-cart" data-id="${p.id}">Agregar</button>
+              <button class="btn secondary view-product" data-id="${p.id}">Ver</button>
+            </div>
+          </div>
+        `;
+      });
+      navigate('productos');
+    });
+
+    // ====== Carrito UI y lógica ======
+    function updateCartUI(){
+      const count = CART.reduce((s, it) => s + it.qty, 0);
+      document.getElementById('cartCount').textContent = count;
+      const list = document.getElementById('cartItemsList');
+      list.innerHTML = '';
+      if(CART.length === 0){
+        list.innerHTML = '<div style="padding:12px;color:var(--muted)">Tu carrito está vacío.</div>';
+        document.getElementById('cartSubtotal').textContent = '$0.00';
+        return;
+      }
+      CART.forEach(item => {
+        const p = findProduct(item.id);
+        const price = p.onSale ? p.salePrice : p.price;
+        list.innerHTML += `
+          <div class="cart-item" data-id="${item.id}">
+            <img class="thumb" src="${p.img}?w=400&q=60" alt="${escapeHtml(p.title)}">
+            <div class="meta">
+              <h4>${escapeHtml(p.title)}</h4>
+              <small>${money(price)} • stock ${p.stock}</small>
+              <div class="cart-controls">
+                <div class="qty">
+                  <button class="qty-minus" data-id="${item.id}">-</button>
+                  <input type="text" value="${item.qty}" data-id="${item.id}" style="width:36px" />
+                  <button class="qty-plus" data-id="${item.id}">+</button>
+                </div>
+                <button class="btn secondary remove-item" data-id="${item.id}">Eliminar</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      const subtotal = CART.reduce((s,it) => {
+        const p = findProduct(it.id);
+        const price = p.onSale ? p.salePrice : p.price;
+        return s + price * it.qty;
+      }, 0);
+      document.getElementById('cartSubtotal').textContent = money(subtotal);
+    }
+
+    function addToCart(id, qty = 1){
+      const product = findProduct(id);
+      if(!product) return alert('Producto no disponible');
+      const existing = CART.find(i => i.id === id);
+      if(existing){
+        if(existing.qty + qty > product.stock) { alert('No hay suficiente stock'); return; }
+        existing.qty += qty;
+      } else {
+        if(qty > product.stock) { alert('No hay suficiente stock'); return; }
+        CART.push({ id, qty });
+      }
+      saveCart();
+      showCart();
+    }
+
+    // eventos delegados: botones "Agregar"
+    document.body.addEventListener('click', (e) => {
+      if(e.target.closest('.add-to-cart')){
+        const id = e.target.closest('.add-to-cart').dataset.id;
+        addToCart(id, 1);
+      }
+      if(e.target.closest('.view-product')){
+        const id = e.target.closest('.view-product').dataset.id;
+        viewProduct(id);
+      }
+      if(e.target.id === 'openCartBtn') showCart();
+      if(e.target.id === 'closeCartBtn') hideCart();
+      if(e.target.id === 'continueShopping') { hideCart(); navigate('productos'); }
+      if(e.target.id === 'proceedCheckout') showCheckoutForm();
+      if(e.target.id === 'finishBtn') { hideCart(); navigate('productos'); }
+    });
+
+    // Quitar item / qty
+    document.getElementById('cartItemsList').addEventListener('click', (e) => {
+      if(e.target.closest('.remove-item')){
+        const id = e.target.dataset.id;
+        CART = CART.filter(i => i.id !== id);
+        saveCart();
+      }
+      if(e.target.closest('.qty-minus')){
+        const id = e.target.dataset.id;
+        const it = CART.find(i=>i.id===id);
+        if(!it) return;
+        if(it.qty > 1) it.qty--;
+        saveCart();
+      }
+      if(e.target.closest('.qty-plus')){
+        const id = e.target.dataset.id;
+        const it = CART.find(i=>i.id===id);
+        const p = findProduct(id);
+        if(it.qty < p.stock) it.qty++;
+        else alert('Límite de stock alcanzado');
+        saveCart();
+      }
+    });
+
+    // input qty directo
+    document.getElementById('cartItemsList').addEventListener('change', (e) => {
+      if(e.target.matches('input[type="text"]')){
+        const id = e.target.dataset.id;
+        let v = parseInt(e.target.value) || 1;
+        const p = findProduct(id);
+        if(v < 1) v = 1;
+        if(v > p.stock) { alert('Excede stock'); v = p.stock; }
+        const it = CART.find(i=>i.id===id);
+        if(it){ it.qty = v; saveCart(); }
+      }
+    });
+
+    // Mostrar/ocultar panel carrito
+    function showCart(){
+      document.getElementById('cartPanel').style.display = 'flex';
+      document.getElementById('cartPanel').setAttribute('aria-hidden','false');
+      updateCartUI();
+    }
+    function hideCart(){
+      document.getElementById('cartPanel').style.display = 'none';
+      document.getElementById('cartPanel').setAttribute('aria-hidden','true');
+    }
+
+    // Mostrar checkout
+    function showCheckoutForm(){
+      if(CART.length === 0) { alert('Tu carrito está vacío'); return; }
+      document.getElementById('checkoutArea').style.display = 'block';
+      document.getElementById('cartFooter').style.display = 'none';
+      document.getElementById('orderConfirmationArea').style.display = 'none';
+      setTimeout(()=>document.getElementById('cfName').focus(),50);
+    }
+    document.getElementById('backToCart').addEventListener('click', () => {
+      document.getElementById('checkoutArea').style.display = 'none';
+      document.getElementById('cartFooter').style.display = 'flex';
+    });
+
+    // Checkout submit (simulado)
+    document.getElementById('checkoutForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = document.getElementById('cfName').value.trim();
+      const email = document.getElementById('cfEmail').value.trim();
+      const address = document.getElementById('cfAddress').value.trim();
+      if(!name || !email || !address){ alert('Completa todos los campos'); return; }
+
+      const orderNum = 'DB-' + Math.floor(1000 + Math.random()*9000) + '-' + Date.now().toString().slice(-4);
+      const subtotal = CART.reduce((s,it) => {
+        const p = findProduct(it.id); const price = p.onSale ? p.salePrice : p.price;
+        return s + price * it.qty;
+      },0);
+      const shipping = subtotal > 50 ? 0 : 5.99;
+      const taxes = +(subtotal * 0.12).toFixed(2);
+      const total = +(subtotal + shipping + taxes).toFixed(2);
+
+      document.getElementById('orderSummaryText').innerHTML = `
+        Pedido <strong>${orderNum}</strong><br>
+        ${CART.length} producto(s) — Subtotal ${money(subtotal)} • Envío ${money(shipping)} • Impuestos ${money(taxes)}<br>
+        <strong>Total ${money(total)}</strong><br>
+        Un correo de confirmación será enviado a <strong>${escapeHtml(email)}</strong> (simulado).
+      `;
+
+      CART = [];
+      saveCart();
+      document.getElementById('checkoutArea').style.display = 'none';
+      document.getElementById('orderConfirmationArea').style.display = 'block';
+      document.getElementById('cartFooter').style.display = 'none';
+      updateCartUI();
+    });
+
+    // Contact form (simulado)
+    document.getElementById('contactForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      alert('Mensaje enviado (simulado). Gracias por escribirnos.');
+      document.getElementById('contactForm').reset();
+    });
+
+    // Visualizar producto (detalle simple)
+    function viewProduct(id){
+      const p = findProduct(id);
+      if(!p) return;
+      // mostrar en sección productos con detalles y reseñas
+      const container = document.getElementById('productsGrid');
+      const reseñas = JSON.parse(localStorage.getItem('reviews_'+id)||'[]');
+      let html = `<div class="card"><h3>${escapeHtml(p.title)}</h3><img src="${p.img}?w=800&q=60" alt="${escapeHtml(p.title)}"><p class="small">Categoria: ${escapeHtml(p.category)}</p><p class="price">${money(p.onSale ? p.salePrice : p.price)}</p><p class="small">Stock: ${p.stock}</p><div style="display:flex;gap:8px;margin-top:8px"><button class="btn add-to-cart" data-id="${p.id}">Agregar</button><button class="btn secondary" onclick="navigate('productos')">Volver</button></div></div>`;
+      html += `<div class="review-box"><h4>Opiniones</h4><form onsubmit="saveProductReview(event,'${id}')"><input id='name_${id}' placeholder='Tu nombre' required><textarea id='comment_${id}' placeholder='Tu opinión' required></textarea><button class='btn' type="submit">Enviar</button></form>`;
+      reseñas.forEach(r=>{ html+=`<div class='review'><strong>${escapeHtml(r.name)}</strong><p>${escapeHtml(r.comment)}</p></div>`; });
+      html += `</div>`;
+      container.innerHTML = html;
+      navigate('productos');
+    }
+
+    function saveProductReview(e,id){
+      e.preventDefault();
+      const name = document.getElementById('name_'+id).value.trim();
+      const comment = document.getElementById('comment_'+id).value.trim();
+      if(!name || !comment) return;
+      const list = JSON.parse(localStorage.getItem('reviews_'+id)||'[]');
+      list.push({name, comment});
+      localStorage.setItem('reviews_'+id, JSON.stringify(list));
+      viewProduct(id);
+      updateAllReviewsList();
+    }
+
+    // ====== Reseñas de la página principal ======
+    document.getElementById('homeReviewForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const name = document.getElementById('homeUser').value.trim();
+      const comment = document.getElementById('homeComment').value.trim();
+      if(!name || !comment) return;
+      const list = JSON.parse(localStorage.getItem('home_reviews')||'[]');
+      list.push({name, comment});
+      localStorage.setItem('home_reviews', JSON.stringify(list));
+      renderHomeReviews();
+      e.target.reset();
+      updateAllReviewsList();
+    });
+
+    function renderHomeReviews(){
+      const list = JSON.parse(localStorage.getItem('home_reviews')||'[]');
+      const el = document.getElementById('homeReviewsList');
+      el.innerHTML = '';
+      list.forEach(r => {
+        el.innerHTML += `<div class='review'><strong>${escapeHtml(r.name)}</strong><p>${escapeHtml(r.comment)}</p></div>`;
+      });
+    }
+
+    function updateAllReviewsList(){
+      const el = document.getElementById('allReviewsList');
+      if(!el) return;
+      el.innerHTML = '<h3>Reseñas generales</h3>';
+      const home = JSON.parse(localStorage.getItem('home_reviews')||'[]');
+      if(home.length) { home.forEach(r=> el.innerHTML += `<div class='review'><strong>${escapeHtml(r.name)}</strong><p>${escapeHtml(r.comment)}</p></div>`); }
+      PRODUCTS.forEach(p=>{
+        const pr = JSON.parse(localStorage.getItem('reviews_'+p.id)||'[]');
+        if(pr.length){
+          el.innerHTML += `<h4 style="margin-top:12px">${escapeHtml(p.title)}</h4>`;
+          pr.forEach(r=> el.innerHTML += `<div class='review'><strong>${escapeHtml(r.name)}</strong><p>${escapeHtml(r.comment)}</p></div>`);
+        }
+      });
+    }
+
+    // ====== Registro / Login (simulado con localStorage) ======
+    document.getElementById('registerForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const pass = document.getElementById('regPass').value.trim();
+      if(!name || !email || !pass) return alert('Completa todos los campos');
+      localStorage.setItem('user', JSON.stringify({name, email, pass}));
+      alert('Cuenta creada correctamente.');
+      e.target.reset();
+    });
+
+    document.getElementById('loginForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const email = document.getElementById('logEmail').value.trim();
+      const pass = document.getElementById('logPass').value.trim();
+      const u = JSON.parse(localStorage.getItem('user'));
+      if(u && u.email === email && u.pass === pass) {
+        alert('Inicio de sesión exitoso, bienvenido ' + u.name);
+      } else {
+        alert('Credenciales incorrectas');
+      }
+    });
+
+    document.getElementById('googleBtn').addEventListener('click', ()=> alert('Inicio de sesión con Google simulado'));
+    document.getElementById('gmailBtn').addEventListener('click', ()=> alert('Inicio de sesión con Gmail simulado'));
+
+    // helper money duplicate safety
+    function money(v){ return '$' + Number(v).toFixed(2); }
+
+    // delegación para botones dinámicos
+    document.addEventListener('click', (e) => {
+      const addBtn = e.target.closest('.add-to-cart');
+      if(addBtn) { addToCart(addBtn.dataset.id, 1); }
+    });
+
+    // iniciar
+    initViews();
+    navigate('home');
+    updateCartUI();
+  </script>
+</body>
+</html>
