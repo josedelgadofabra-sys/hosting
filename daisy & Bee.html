@@ -292,13 +292,17 @@
     <div id="orderConfirmationArea" style="display:none;padding:12px;border-top:1px solid #f0f0f0;background:#fff">
       <h3>¡Pedido confirmado!</h3>
       <p class="small" id="orderSummaryText"></p>
-      <div style="display:flex;gap:8px;margin-top:8px">
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
         <button class="btn" id="finishBtn">Seguir Comprando</button>
+        <button class="btn secondary" id="resendWhatsAppBtn" style="display:none">📱 Reenviar por WhatsApp</button>
       </div>
     </div>
   </div>
 
   <script>
+    // ====== Configuración ======
+    const WHATSAPP_NUMBER = '573146321627'; // Cambia este número por el número de WhatsApp de la tienda (sin +, espacios o guiones)
+    
     // ====== Datos de productos ======
     const PRODUCTS = [
       { id: 'p1', title: 'Paleta de Sombras Daisy', price: 24.99, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2', stock: 10, featured:true },
@@ -326,6 +330,7 @@
 
     // ====== Carrito (persistente con localStorage) ======
     let CART = JSON.parse(localStorage.getItem('daisybee_cart') || '[]');
+    let lastWhatsAppMessage = null; // Guardar el último mensaje de WhatsApp para reenvío
 
     // util
     function money(v){ return '$' + Number(v).toFixed(2); }
@@ -487,6 +492,9 @@
       if(e.target.id === 'continueShopping') { hideCart(); navigate('productos'); }
       if(e.target.id === 'proceedCheckout') showCheckoutForm();
       if(e.target.id === 'finishBtn') { hideCart(); navigate('productos'); }
+      if(e.target.id === 'resendWhatsAppBtn' && lastWhatsAppMessage) {
+        sendOrderToWhatsApp(lastWhatsAppMessage);
+      }
     });
 
     // Quitar item / qty
@@ -537,6 +545,34 @@
       document.getElementById('cartPanel').setAttribute('aria-hidden','true');
     }
 
+    // Generar mensaje de WhatsApp con el pedido
+    function generateWhatsAppMessage(name, email, address, orderNum, cartItems, subtotal, shipping, taxes, total){
+      let message = `🛍️ *NUEVO PEDIDO - Daisy & Bee*\n\n`;
+      message += `*Pedido:* ${orderNum}\n`;
+      message += `*Cliente:* ${name}\n`;
+      message += `*Email:* ${email}\n`;
+      message += `*Dirección:* ${address}\n\n`;
+      message += `*Productos:*\n`;
+      cartItems.forEach(item => {
+        const p = findProduct(item.id);
+        const price = p.onSale ? p.salePrice : p.price;
+        message += `• ${p.title} x${item.qty} - ${money(price)} c/u\n`;
+      });
+      message += `\n*Resumen:*\n`;
+      message += `Subtotal: ${money(subtotal)}\n`;
+      message += `Envío: ${money(shipping)}\n`;
+      message += `Impuestos: ${money(taxes)}\n`;
+      message += `*TOTAL: ${money(total)}*\n\n`;
+      message += `Fecha: ${new Date().toLocaleString('es-ES')}`;
+      return encodeURIComponent(message);
+    }
+
+    // Abrir WhatsApp con el mensaje del pedido
+    function sendOrderToWhatsApp(message){
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+      window.open(whatsappUrl, '_blank');
+    }
+
     // Mostrar checkout
     function showCheckoutForm(){
       if(CART.length === 0) { alert('Tu carrito está vacío'); return; }
@@ -567,10 +603,19 @@
       const taxes = +(subtotal * 0.12).toFixed(2);
       const total = +(subtotal + shipping + taxes).toFixed(2);
 
+      // Guardar una copia del carrito antes de limpiarlo para el mensaje de WhatsApp
+      const cartCopy = JSON.parse(JSON.stringify(CART));
+
+      // Generar y enviar mensaje de WhatsApp
+      const whatsappMessage = generateWhatsAppMessage(name, email, address, orderNum, cartCopy, subtotal, shipping, taxes, total);
+      lastWhatsAppMessage = whatsappMessage; // Guardar para reenvío
+      sendOrderToWhatsApp(whatsappMessage);
+
       document.getElementById('orderSummaryText').innerHTML = `
         Pedido <strong>${orderNum}</strong><br>
         ${CART.length} producto(s) — Subtotal ${money(subtotal)} • Envío ${money(shipping)} • Impuestos ${money(taxes)}<br>
         <strong>Total ${money(total)}</strong><br>
+        Se ha abierto WhatsApp para enviar los detalles del pedido.<br>
         Un correo de confirmación será enviado a <strong>${escapeHtml(email)}</strong> (simulado).
       `;
 
@@ -579,6 +624,7 @@
       document.getElementById('checkoutArea').style.display = 'none';
       document.getElementById('orderConfirmationArea').style.display = 'block';
       document.getElementById('cartFooter').style.display = 'none';
+      document.getElementById('resendWhatsAppBtn').style.display = 'inline-block';
       updateCartUI();
     });
 
