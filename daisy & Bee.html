@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Daisy & Bee - Tienda Completa</title>
+  <!-- PayPal SDK - Se carga dinámicamente después de configurar el CLIENT_ID -->
   <style>
     :root{
       --main:#ff7eb9;
@@ -99,6 +100,42 @@
     @keyframes slideInUp{
       from{transform:translateY(100%); opacity:0}
       to{transform:translateY(0); opacity:1}
+    }
+    
+    /* WhatsApp floating button */
+    .whatsapp-float{
+      position:fixed;
+      bottom:80px;
+      right:18px;
+      width:60px;
+      height:60px;
+      background:#25D366;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 4px 12px rgba(37,211,102,0.4);
+      z-index:55;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      text-decoration:none;
+      font-size:32px;
+    }
+    .whatsapp-float:hover{
+      transform:scale(1.1);
+      box-shadow:0 6px 20px rgba(37,211,102,0.6);
+    }
+    .whatsapp-float:active{
+      transform:scale(0.95);
+    }
+    @media (max-width:700px){
+      .whatsapp-float{
+        bottom:70px;
+        right:12px;
+        width:56px;
+        height:56px;
+        font-size:28px;
+      }
     }
   </style>
 </head>
@@ -282,9 +319,10 @@
           <label>Dirección</label>
           <input type="text" id="cfAddress" required>
         </div>
-        <div style="display:flex;gap:8px">
+        <div id="paypal-button-container" style="margin-top:12px"></div>
+        <div style="display:flex;gap:8px;margin-top:12px">
           <button type="button" class="btn secondary" id="backToCart">Volver</button>
-          <button type="submit" class="btn">Confirmar Compra</button>
+          <button type="button" class="btn" id="payWithWhatsAppBtn">Pagar con WhatsApp</button>
         </div>
       </form>
     </div>
@@ -299,9 +337,19 @@
     </div>
   </div>
 
+  <!-- Botón flotante de WhatsApp -->
+  <a href="#" class="whatsapp-float" id="whatsappFloatBtn" aria-label="Contactar por WhatsApp" title="Contáctanos por WhatsApp">
+    💬
+  </a>
+
   <script>
     // ====== Configuración ======
     const WHATSAPP_NUMBER = '573146321627'; // Cambia este número por el número de WhatsApp de la tienda (sin +, espacios o guiones)
+    const PAYPAL_CLIENT_ID = 'YOUR_PAYPAL_CLIENT_ID'; // Reemplaza con tu Client ID de PayPal
+    
+    // Variables globales para el pedido actual
+    let currentOrderData = null;
+    let paypalButtons = null;
     
     // ====== Datos de productos ======
     const PRODUCTS = [
@@ -495,6 +543,10 @@
       if(e.target.id === 'resendWhatsAppBtn' && lastWhatsAppMessage) {
         sendOrderToWhatsApp(lastWhatsAppMessage);
       }
+      if(e.target.id === 'whatsappFloatBtn'){
+        e.preventDefault();
+        openWhatsAppContact();
+      }
     });
 
     // Quitar item / qty
@@ -567,10 +619,156 @@
       return encodeURIComponent(message);
     }
 
+    // Generar código de pedido único
+    function generateOrderCode(){
+      const timestamp = Date.now();
+      const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+      const date = new Date();
+      const dateStr = date.getFullYear().toString().slice(-2) + 
+                     (date.getMonth() + 1).toString().padStart(2, '0') + 
+                     date.getDate().toString().padStart(2, '0');
+      return `DB-${dateStr}-${random}-${timestamp.toString().slice(-6)}`;
+    }
+
     // Abrir WhatsApp con el mensaje del pedido
     function sendOrderToWhatsApp(message){
       const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
       window.open(whatsappUrl, '_blank');
+    }
+
+    // Abrir WhatsApp con mensaje de contacto general
+    function openWhatsAppContact(){
+      const message = encodeURIComponent('Hola! Me interesa conocer más sobre los productos de Daisy & Bee 🌼');
+      const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+      window.open(whatsappUrl, '_blank');
+    }
+
+    // Cargar SDK de PayPal dinámicamente
+    function loadPayPalSDK(callback){
+      if(typeof paypal !== 'undefined'){
+        callback();
+        return;
+      }
+      
+      if(PAYPAL_CLIENT_ID === 'YOUR_PAYPAL_CLIENT_ID'){
+        callback(); // Continuar sin PayPal
+        return;
+      }
+      
+      const script = document.createElement('script');
+      script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD&intent=capture`;
+      script.onload = callback;
+      script.onerror = function(){
+        console.error('Error al cargar PayPal SDK');
+        callback();
+      };
+      document.head.appendChild(script);
+    }
+
+    // Inicializar PayPal
+    function initPayPal(total, orderId){
+      const container = document.getElementById('paypal-button-container');
+      container.innerHTML = '<p class="small" style="color:var(--muted);padding:8px">Cargando PayPal...</p>';
+      
+      if(paypalButtons) {
+        paypalButtons.close();
+        paypalButtons = null;
+      }
+
+      loadPayPalSDK(function(){
+        if(typeof paypal === 'undefined' || PAYPAL_CLIENT_ID === 'YOUR_PAYPAL_CLIENT_ID'){
+          container.innerHTML = '<p class="small" style="color:var(--muted);padding:8px">PayPal no configurado. Usa el botón de WhatsApp para pagar.</p>';
+          return;
+        }
+
+      paypalButtons = paypal.Buttons({
+        createOrder: function(data, actions) {
+          return actions.order.create({
+            purchase_units: [{
+              reference_id: orderId,
+              description: `Pedido ${orderId} - Daisy & Bee`,
+              amount: {
+                value: total.toFixed(2),
+                currency_code: 'USD'
+              }
+            }],
+            application_context: {
+              brand_name: 'Daisy & Bee',
+              landing_page: 'BILLING',
+              user_action: 'PAY_NOW'
+            }
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(details) {
+            // Procesar el pago exitoso
+            if(details.status === 'COMPLETED'){
+              processOrderAfterPayment(currentOrderData, details.id);
+            }
+          });
+        },
+        onError: function(err) {
+          console.error('Error en PayPal:', err);
+          alert('Hubo un error al procesar el pago. Por favor, intenta con WhatsApp.');
+        },
+        onCancel: function(data) {
+          console.log('Pago cancelado por el usuario');
+        }
+      });
+      paypalButtons.render('#paypal-button-container');
+      }); // Cerrar callback de loadPayPalSDK
+    }
+
+    // Procesar pedido después del pago de PayPal
+    function processOrderAfterPayment(orderData, paypalTransactionId){
+      const { name, email, address, orderNum, cartCopy, subtotal, shipping, taxes, total } = orderData;
+      
+      // Generar mensaje de WhatsApp con información de PayPal
+      let message = `🛍️ *PEDIDO PAGADO - Daisy & Bee*\n\n`;
+      message += `*Pedido:* ${orderNum}\n`;
+      message += `*Transacción PayPal:* ${paypalTransactionId}\n`;
+      message += `*Cliente:* ${name}\n`;
+      message += `*Email:* ${email}\n`;
+      message += `*Dirección:* ${address}\n\n`;
+      message += `*Productos:*\n`;
+      cartCopy.forEach(item => {
+        const p = findProduct(item.id);
+        const price = p.onSale ? p.salePrice : p.price;
+        message += `• ${p.title} x${item.qty} - ${money(price)} c/u\n`;
+      });
+      message += `\n*Resumen:*\n`;
+      message += `Subtotal: ${money(subtotal)}\n`;
+      message += `Envío: ${money(shipping)}\n`;
+      message += `Impuestos: ${money(taxes)}\n`;
+      message += `*TOTAL PAGADO: ${money(total)}*\n\n`;
+      message += `✅ Pago confirmado vía PayPal\n`;
+      message += `Fecha: ${new Date().toLocaleString('es-ES')}`;
+      
+      const whatsappMessage = encodeURIComponent(message);
+      lastWhatsAppMessage = whatsappMessage;
+      
+      // Limpiar carrito
+      CART = [];
+      saveCart();
+      
+      // Mostrar confirmación
+      document.getElementById('orderSummaryText').innerHTML = `
+        Pedido <strong>${orderNum}</strong><br>
+        Transacción PayPal: <strong>${paypalTransactionId}</strong><br>
+        ${cartCopy.length} producto(s) — Subtotal ${money(subtotal)} • Envío ${money(shipping)} • Impuestos ${money(taxes)}<br>
+        <strong>Total Pagado: ${money(total)}</strong><br>
+        ✅ Pago confirmado exitosamente.<br>
+        Se ha abierto WhatsApp para enviar los detalles del pedido.
+      `;
+      
+      document.getElementById('checkoutArea').style.display = 'none';
+      document.getElementById('orderConfirmationArea').style.display = 'block';
+      document.getElementById('cartFooter').style.display = 'none';
+      document.getElementById('resendWhatsAppBtn').style.display = 'inline-block';
+      updateCartUI();
+      
+      // Enviar a WhatsApp
+      sendOrderToWhatsApp(whatsappMessage);
     }
 
     // Mostrar checkout
@@ -579,22 +777,44 @@
       document.getElementById('checkoutArea').style.display = 'block';
       document.getElementById('cartFooter').style.display = 'none';
       document.getElementById('orderConfirmationArea').style.display = 'none';
+      document.getElementById('resendWhatsAppBtn').style.display = 'none';
+      
+      // Calcular totales para mostrar PayPal
+      const subtotal = CART.reduce((s,it) => {
+        const p = findProduct(it.id);
+        const price = p.onSale ? p.salePrice : p.price;
+        return s + price * it.qty;
+      },0);
+      const shipping = subtotal > 50 ? 0 : 5.99;
+      const taxes = +(subtotal * 0.12).toFixed(2);
+      const total = +(subtotal + shipping + taxes).toFixed(2);
+      
+      // Generar código de pedido único
+      const orderId = generateOrderCode();
+      
+      // Inicializar PayPal con el total y el ID de pedido
+      initPayPal(total, orderId);
+      
       setTimeout(()=>document.getElementById('cfName').focus(),50);
     }
     document.getElementById('backToCart').addEventListener('click', () => {
       document.getElementById('checkoutArea').style.display = 'none';
       document.getElementById('cartFooter').style.display = 'flex';
+      document.getElementById('paypal-button-container').innerHTML = '';
+      if(paypalButtons) {
+        paypalButtons.close();
+        paypalButtons = null;
+      }
     });
 
-    // Checkout submit (simulado)
-    document.getElementById('checkoutForm').addEventListener('submit', (e) => {
-      e.preventDefault();
+    // Procesar pedido vía WhatsApp (sin PayPal)
+    function processOrderViaWhatsApp(){
       const name = document.getElementById('cfName').value.trim();
       const email = document.getElementById('cfEmail').value.trim();
       const address = document.getElementById('cfAddress').value.trim();
       if(!name || !email || !address){ alert('Completa todos los campos'); return; }
 
-      const orderNum = 'DB-' + Math.floor(1000 + Math.random()*9000) + '-' + Date.now().toString().slice(-4);
+      const orderNum = generateOrderCode();
       const subtotal = CART.reduce((s,it) => {
         const p = findProduct(it.id); const price = p.onSale ? p.salePrice : p.price;
         return s + price * it.qty;
@@ -605,6 +825,9 @@
 
       // Guardar una copia del carrito antes de limpiarlo para el mensaje de WhatsApp
       const cartCopy = JSON.parse(JSON.stringify(CART));
+
+      // Guardar datos del pedido para PayPal (si se usa después)
+      currentOrderData = { name, email, address, orderNum, cartCopy, subtotal, shipping, taxes, total };
 
       // Generar y enviar mensaje de WhatsApp
       const whatsappMessage = generateWhatsAppMessage(name, email, address, orderNum, cartCopy, subtotal, shipping, taxes, total);
@@ -626,6 +849,46 @@
       document.getElementById('cartFooter').style.display = 'none';
       document.getElementById('resendWhatsAppBtn').style.display = 'inline-block';
       updateCartUI();
+    }
+
+    // Botón de pago con WhatsApp
+    document.getElementById('payWithWhatsAppBtn').addEventListener('click', (e) => {
+      e.preventDefault();
+      processOrderViaWhatsApp();
+    });
+
+    // Validar formulario antes de mostrar PayPal
+    document.getElementById('checkoutForm').addEventListener('input', () => {
+      const name = document.getElementById('cfName').value.trim();
+      const email = document.getElementById('cfEmail').value.trim();
+      const address = document.getElementById('cfAddress').value.trim();
+      
+      if(name && email && address){
+        // Recalcular y actualizar PayPal cuando los campos estén completos
+        const subtotal = CART.reduce((s,it) => {
+          const p = findProduct(it.id); const price = p.onSale ? p.salePrice : p.price;
+          return s + price * it.qty;
+        },0);
+        const shipping = subtotal > 50 ? 0 : 5.99;
+        const taxes = +(subtotal * 0.12).toFixed(2);
+        const total = +(subtotal + shipping + taxes).toFixed(2);
+        const orderId = generateOrderCode();
+        
+        // Guardar datos del pedido
+        currentOrderData = {
+          name,
+          email,
+          address,
+          orderNum: orderId,
+          cartCopy: JSON.parse(JSON.stringify(CART)),
+          subtotal,
+          shipping,
+          taxes,
+          total
+        };
+        
+        initPayPal(total, orderId);
+      }
     });
 
     // Contact form (simulado)
