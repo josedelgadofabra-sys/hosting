@@ -1,9 +1,10 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Daisy & Bee - Tienda Completa</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daisy &amp; Bee - Tienda Completa</title>
+  <!-- PayPal SDK - Se carga dinámicamente después de configurar el CLIENT_ID -->
   <style>
     :root{
       --main:#ff7eb9;
@@ -100,6 +101,126 @@
       from{transform:translateY(100%); opacity:0}
       to{transform:translateY(0); opacity:1}
     }
+    
+    /* Order history styles */
+    .order-card{
+      background:var(--card);
+      border-radius:12px;
+      padding:16px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+      transition:all 0.3s ease;
+      border-left:4px solid var(--main);
+    }
+    .order-card:hover{
+      transform:translateY(-2px);
+      box-shadow:0 6px 16px rgba(0,0,0,0.12);
+    }
+    .order-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .order-status{
+      padding:6px 12px;
+      border-radius:20px;
+      font-size:12px;
+      font-weight:700;
+      text-transform:uppercase;
+    }
+    .order-status.pendiente{background:#fff3cd;color:#856404}
+    .order-status.empacando{background:#d1ecf1;color:#0c5460}
+    .order-status.enviando{background:#cce5ff;color:#004085}
+    .order-status.entregado{background:#d4edda;color:#155724}
+    .order-products{
+      margin-top:12px;
+      padding-top:12px;
+      border-top:1px solid #eee;
+    }
+    .order-product-item{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-bottom:8px;
+      font-size:14px;
+    }
+    .order-product-item img{
+      width:50px;
+      height:50px;
+      border-radius:6px;
+      object-fit:cover;
+    }
+    
+    /* WhatsApp floating button */
+    .whatsapp-float{
+      position:fixed;
+      bottom:80px;
+      right:18px;
+      width:60px;
+      height:60px;
+      background:#25D366;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 4px 12px rgba(37,211,102,0.4);
+      z-index:55;
+      cursor:pointer;
+      transition:all 0.3s ease;
+      text-decoration:none;
+      font-size:32px;
+    }
+    .whatsapp-float:hover{
+      transform:scale(1.1);
+      box-shadow:0 6px 20px rgba(37,211,102,0.6);
+    }
+    .whatsapp-float:active{
+      transform:scale(0.95);
+    }
+    @media (max-width:700px){
+      .whatsapp-float{
+        bottom:70px;
+        right:12px;
+        width:56px;
+        height:56px;
+        font-size:28px;
+      }
+    }
+    
+    /* Additional styles for elements that had inline styles */
+    .header-actions{display:flex;align-items:center;gap:12px}
+    .hero-subtitle{margin-top:8px;color:var(--muted)}
+    .hero-btn-container{margin-top:12px}
+    .hero-img{height:120px;border-radius:12px;object-fit:cover;margin-left:auto}
+    .logo-icon.hidden{display:none}
+    .page.hidden{display:none}
+    .btn-group{display:flex;gap:8px;margin-top:8px}
+    .cart-actions{display:flex;gap:8px}
+    .order-confirm-actions{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .checkout-area{display:none;padding:12px;border-top:1px solid #f0f0f0;background:linear-gradient(0deg,#fff,rgba(255,255,255,0.9))}
+    .checkout-form{display:flex;flex-direction:column;gap:8px}
+    .checkout-actions{display:flex;gap:8px;margin-top:12px}
+    .payment-select{padding:10px;border-radius:8px;border:1px solid #eee;outline:none;transition:all 0.3s ease}
+    .paypal-container{margin-top:12px;display:none}
+    .payment-info{display:none;padding:12px;background:#f9f9f9;border-radius:8px;margin-top:8px}
+    .order-confirmation-area{display:none;padding:12px;border-top:1px solid #f0f0f0;background:#fff}
+    .resend-btn{display:none}
+    .orders-list{display:flex;flex-direction:column;gap:16px;margin-top:18px}
+    .contact-form{max-width:600px;margin-top:12px}
+    .account-card{padding:16px}
+    .login-form{margin-top:20px}
+    .login-btn{margin-top:8px}
+    .products-subtitle{margin:8px 0}
+    .card-actions{display:flex;gap:8px;margin-top:auto}
+    .card-payment-form{display:none;padding:12px;border-top:1px solid #f0f0f0;background:linear-gradient(0deg,#fff,rgba(255,255,255,0.9))}
+    .card-input-group{display:flex;gap:8px}
+    .card-input-group .form-group{flex:1}
+    .card-number-input{font-family:monospace;letter-spacing:2px}
+    .security-badge{display:flex;align-items:center;gap:6px;padding:8px;background:#e8f5e9;border-radius:8px;margin-top:8px;font-size:12px;color:#2e7d32}
+    .card-form-subtitle{margin-bottom:12px}
+    .card-form-actions{margin-top:16px}
   </style>
 </head>
 <body>
@@ -108,8 +229,8 @@
       <div class="brand">
         <!-- si no tienes logo, se usa emoji -->
         <img id="brandLogo" src="49af961a-0543-495b-b7b3-185e32404cf9.png" alt="logo" onerror="this.style.display='none'">
-        <div class="logo-icon" style="display:none">🌼</div>
-        <h1>Daisy & Bee</h1>
+        <div class="logo-icon hidden">🌼</div>
+        <h1>Daisy &amp; Bee</h1>
       </div>
 
       <nav>
@@ -120,18 +241,19 @@
           <li><a href="#" data-page="maquillajes" class="nav-link">Maquillajes</a></li>
           <li><a href="#" data-page="ofertas" class="nav-link">Ofertas</a></li>
           <li><a href="#" data-page="reviews" class="nav-link">Reseñas</a></li>
+          <li><a href="#" data-page="historial" class="nav-link">Mis Pedidos</a></li>
           <li><a href="#" data-page="cuenta" class="nav-link">Cuenta</a></li>
         </ul>
       </nav>
 
-      <div style="display:flex;align-items:center;gap:12px">
+      <div class="header-actions">
         <div class="search">
-          <input id="searchInput" placeholder="Buscar..." />
-          <button class="btn secondary" id="searchBtn">Buscar</button>
+          <input id="searchInput" type="search" placeholder="Buscar...">
+          <button class="btn secondary" id="searchBtn" type="button">Buscar</button>
         </div>
 
         <div class="icons">
-          <button class="btn secondary" id="openCartBtn" aria-label="Abrir carrito">🛒</button>
+          <button class="btn secondary" id="openCartBtn" aria-label="Abrir carrito" type="button">🛒</button>
           <div class="cart-badge" id="cartCount">0</div>
         </div>
       </div>
@@ -144,11 +266,13 @@
       <div id="page-home" class="page">
         <div class="hero">
           <div>
-            <div class="title">Bienvenida a Daisy & Bee</div>
-            <div class="small" style="margin-top:8px;color:var(--muted)">Encuentra accesorios y maquillaje de calidad</div>
-            <div style="margin-top:12px"><button class="cta btn" onclick="navigate('productos')">Ver Productos</button></div>
+            <div class="title">Bienvenida a Daisy &amp; Bee</div>
+            <div class="small hero-subtitle">Encuentra accesorios y maquillaje de calidad</div>
+            <div class="hero-btn-container">
+              <button class="cta btn" type="button" onclick="navigate('productos')">Ver Productos</button>
+            </div>
           </div>
-          <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9" alt="" style="height:120px;border-radius:12px;object-fit:cover;margin-left:auto">
+          <img src="https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9" alt="" class="hero-img">
         </div>
 
         <h2>Novedades</h2>
@@ -157,7 +281,7 @@
         <div class="review-box">
           <h3>💬 Reseñas de la tienda</h3>
           <form id="homeReviewForm">
-            <input id="homeUser" placeholder="Tu nombre" required>
+            <input id="homeUser" type="text" placeholder="Tu nombre" required>
             <textarea id="homeComment" rows="3" placeholder="Escribe tu reseña..." required></textarea>
             <button type="submit" class="btn">Enviar Reseña</button>
           </form>
@@ -166,66 +290,74 @@
       </div>
 
       <!-- Productos -->
-      <div id="page-productos" class="page" style="display:none">
+      <div id="page-productos" class="page hidden">
         <h2>Productos</h2>
-        <div style="margin:8px 0" class="small">Todos los productos</div>
+        <div class="small products-subtitle">Todos los productos</div>
         <div class="grid" id="productsGrid"></div>
       </div>
 
       <!-- Accesorios -->
-      <div id="page-accesorios" class="page" style="display:none">
+      <div id="page-accesorios" class="page hidden">
         <h2>Accesorios</h2>
         <div class="grid" id="accesoriosGrid"></div>
       </div>
 
       <!-- Maquillajes -->
-      <div id="page-maquillajes" class="page" style="display:none">
+      <div id="page-maquillajes" class="page hidden">
         <h2>Maquillajes</h2>
         <div class="grid" id="maquillajesGrid"></div>
       </div>
 
       <!-- Ofertas -->
-      <div id="page-ofertas" class="page" style="display:none">
+      <div id="page-ofertas" class="page hidden">
         <h2>Ofertas</h2>
         <div class="grid" id="ofertasGrid"></div>
       </div>
 
       <!-- Reviews page -->
-      <div id="page-reviews" class="page" style="display:none">
+      <div id="page-reviews" class="page hidden">
         <h2>Reseñas de la Tienda</h2>
         <div id="allReviewsList"></div>
       </div>
 
+      <!-- Historial de Pedidos -->
+      <div id="page-historial" class="page hidden">
+        <h2>Mis Pedidos</h2>
+        <div id="ordersHistoryList" class="orders-list"></div>
+      </div>
+
       <!-- Cuenta -->
-      <div id="page-cuenta" class="page" style="display:none">
+      <div id="page-cuenta" class="page hidden">
         <h2>Tu Cuenta</h2>
-        <div class="card" style="padding:16px">
+        <div class="card account-card">
           <form id="registerForm">
             <h3>Registrarse</h3>
-            <input id="regName" placeholder="Nombre" required>
+            <input id="regName" type="text" placeholder="Nombre" required>
             <input id="regEmail" type="email" placeholder="Correo" required>
             <input id="regPass" type="password" placeholder="Contraseña" required>
-            <div style="display:flex;gap:8px;margin-top:8px">
+            <div class="btn-group">
               <button type="submit" class="btn">Crear cuenta</button>
               <button type="button" id="googleBtn" class="btn secondary">Entrar con Google</button>
               <button type="button" id="gmailBtn" class="btn secondary">Entrar con Gmail</button>
             </div>
           </form>
 
-          <form id="loginForm" style="margin-top:20px">
+          <!-- Se corrigió la duplicación del botón de Google/Gmail solo necesario en el registro. 
+               Además, aseguramos la consistencia del diseño y eliminación de estilos en línea innecesarios. -->
+          <form id="loginForm" class="login-form">
             <h3>Iniciar Sesión</h3>
             <input id="logEmail" type="email" placeholder="Correo" required>
             <input id="logPass" type="password" placeholder="Contraseña" required>
-            <button type="submit" class="btn" style="margin-top:8px">Entrar</button>
+            <button type="submit" class="btn login-btn">Entrar</button>
           </form>
         </div>
       </div>
 
       <!-- Contacto (simple) -->
-      <div id="page-contacto" class="page" style="display:none">
+      <div id="page-contacto" class="page hidden">
         <h2>Contacto</h2>
         <p class="small">¿Tienes dudas? Escríbenos.</p>
-        <form id="contactForm" style="max-width:600px;margin-top:12px">
+        <form id="contactForm" class="contact-form">
           <div class="form-group">
             <label>Nombre</label>
             <input type="text" id="contactName" required>
@@ -244,16 +376,16 @@
     </section>
 
     <footer>
-      © <span id="year"></span> Daisy & Bee • Hecho con ❤️ — Prototipo
+      © <span id="year"></span> Daisy &amp; Bee • Hecho con ❤️ — Prototipo
     </footer>
   </main>
 
   <!-- Carrito / Checkout Panel -->
-  <div class="cart-panel" id="cartPanel" aria-hidden="true">
+  <div class="cart-panel" id="cartPanel" aria-hidden="true" role="dialog" aria-modal="false">
     <div class="cart-header">
       <strong>Tu Carrito</strong>
       <div>
-        <button class="btn secondary" id="closeCartBtn">Cerrar</button>
+        <button type="button" class="btn secondary" id="closeCartBtn" tabindex="-1">Cerrar</button>
       </div>
     </div>
 
@@ -261,44 +393,108 @@
 
     <div class="cart-footer" id="cartFooter">
       <div class="total-row"><div>Subtotal</div><div id="cartSubtotal">$0.00</div></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn secondary" id="continueShopping">Seguir Comprando</button>
-        <button class="btn" id="proceedCheckout">Ir a Pagar</button>
+      <div class="cart-actions">
+        <button type="button" class="btn secondary" id="continueShopping" tabindex="-1">Seguir Comprando</button>
+        <button type="button" class="btn" id="proceedCheckout" tabindex="-1">Ir a Pagar</button>
       </div>
     </div>
 
-    <div id="checkoutArea" style="display:none;padding:12px;border-top:1px solid #f0f0f0;background:linear-gradient(0deg,#fff,rgba(255,255,255,0.9))">
+    <div id="checkoutArea" class="checkout-area">
       <h3>Checkout</h3>
-      <form id="checkoutForm" style="display:flex;flex-direction:column;gap:8px">
+      <form id="checkoutForm" class="checkout-form">
         <div class="form-group">
           <label>Nombre completo</label>
-          <input type="text" id="cfName" required>
+          <input type="text" id="cfName" required tabindex="-1">
         </div>
         <div class="form-group">
           <label>Email</label>
-          <input type="email" id="cfEmail" required>
+          <input type="email" id="cfEmail" required tabindex="-1">
         </div>
         <div class="form-group">
           <label>Dirección</label>
-          <input type="text" id="cfAddress" required>
+          <input type="text" id="cfAddress" required tabindex="-1">
         </div>
-        <div style="display:flex;gap:8px">
-          <button type="button" class="btn secondary" id="backToCart">Volver</button>
-          <button type="submit" class="btn">Confirmar Compra</button>
+        <div class="form-group">
+          <label>Método de Pago</label>
+          <select id="paymentMethod" class="payment-select" required tabindex="-1">
+            <option value="">Selecciona un método de pago</option>
+            <option value="tarjeta">💳 Tarjeta de Crédito/Débito</option>
+            <option value="efectivo">💵 Efectivo</option>
+            <option value="paypal">🅿️ PayPal</option>
+          </select>
+        </div>
+        <div id="paypal-button-container" class="paypal-container"></div>
+        <div id="cardPaymentInfo" class="payment-info">
+          <p class="small">💡 Completa los datos de tu tarjeta a continuación para procesar el pago de forma segura.</p>
+        </div>
+        <div id="cashPaymentInfo" class="payment-info">
+          <p class="small">💵 Pago en efectivo al momento de la entrega. El repartidor recibirá el pago.</p>
+        </div>
+        <div class="checkout-actions">
+          <button type="button" class="btn secondary" id="backToCart" tabindex="-1">Volver</button>
+          <button type="submit" class="btn" id="confirmOrderBtn" tabindex="-1">Continuar con el Pago</button>
         </div>
       </form>
     </div>
 
-    <div id="orderConfirmationArea" style="display:none;padding:12px;border-top:1px solid #f0f0f0;background:#fff">
+    <!-- Formulario de Pago con Tarjeta -->
+    <div id="cardPaymentForm" class="card-payment-form">
+      <h3>💳 Pago con Tarjeta</h3>
+      <p class="small card-form-subtitle">Ingresa los datos de tu tarjeta de crédito o débito</p>
+      <form id="cardPaymentFormElement" class="checkout-form">
+        <div class="form-group">
+          <label>Nombre del Titular de la Tarjeta</label>
+          <input type="text" id="cardHolderName" placeholder="Como aparece en la tarjeta" required tabindex="-1" autocomplete="cc-name">
+        </div>
+        <div class="form-group">
+          <label>Número de Tarjeta</label>
+          <input type="text" id="cardNumber" class="card-number-input" placeholder="1234 5678 9012 3456" maxlength="19" required tabindex="-1" autocomplete="cc-number">
+        </div>
+        <div class="card-input-group">
+          <div class="form-group">
+            <label>Fecha de Expiración</label>
+            <input type="text" id="cardExpiry" placeholder="MM/AA" maxlength="5" required tabindex="-1" autocomplete="cc-exp">
+          </div>
+          <div class="form-group">
+            <label>CVV</label>
+            <input type="text" id="cardCVV" placeholder="123" maxlength="4" required tabindex="-1" autocomplete="cc-csc">
+          </div>
+        </div>
+        <div class="security-badge">
+          <span>🔒</span>
+          <span>Tu información está protegida. No guardamos los datos de tu tarjeta.</span>
+        </div>
+        <div class="checkout-actions card-form-actions">
+          <button type="button" class="btn secondary" id="backToCheckout" tabindex="-1">Volver</button>
+          <button type="submit" class="btn" id="processCardPayment" tabindex="-1">Procesar Pago</button>
+        </div>
+      </form>
+    </div>
+
+    <div id="orderConfirmationArea" class="order-confirmation-area">
       <h3>¡Pedido confirmado!</h3>
       <p class="small" id="orderSummaryText"></p>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn" id="finishBtn">Seguir Comprando</button>
+      <div class="order-confirm-actions">
+        <button type="button" class="btn" id="finishBtn" tabindex="-1">Seguir Comprando</button>
+        <button type="button" class="btn secondary resend-btn" id="resendWhatsAppBtn" tabindex="-1">📱 Reenviar por WhatsApp</button>
       </div>
     </div>
   </div>
 
+  <!-- Botón flotante de WhatsApp -->
+  <a href="#" class="whatsapp-float" id="whatsappFloatBtn" aria-label="Contactar por WhatsApp" title="Contáctanos por WhatsApp" tabindex="0">
+    💬
+  </a>
+
   <script>
+    // ====== Configuración ======
+    const WHATSAPP_NUMBER = '573146321627'; // Cambia este número por el número de WhatsApp de la tienda (sin +, espacios o guiones)
+    const PAYPAL_CLIENT_ID = 'YOUR_PAYPAL_CLIENT_ID'; // Reemplaza con tu Client ID de PayPal
+    
+    // Variables globales para el pedido actual
+    let currentOrderData = null;
+    let paypalButtons = null;
+    
     // ====== Datos de productos ======
     const PRODUCTS = [
       { id: 'p1', title: 'Paleta de Sombras Daisy', price: 24.99, category: 'maquillajes', img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2', stock: 10, featured:true },
@@ -326,10 +522,94 @@
 
     // ====== Carrito (persistente con localStorage) ======
     let CART = JSON.parse(localStorage.getItem('daisybee_cart') || '[]');
+    let lastWhatsAppMessage = null; // Guardar el último mensaje de WhatsApp para reenvío
+    
+    // ====== Función para generar imágenes relacionadas según el nombre del producto ======
+    function getProductImage(productTitle, category){
+      // Si el producto ya tiene imagen, usarla
+      const product = PRODUCTS.find(p => p.title === productTitle);
+      if(product && product.img && !product.img.includes('placeholder')) {
+        return product.img;
+      }
+      
+      // Generar imagen según palabras clave en el título
+      const title = productTitle.toLowerCase();
+      const baseUrl = 'https://images.unsplash.com/photo-';
+      
+      // Mapeo de palabras clave a IDs de imágenes de Unsplash
+      const imageMap = {
+        'paleta': '1544005313-94ddf0286df2',
+        'sombras': '1544005313-94ddf0286df2',
+        'brochas': '1585386959984-a4155224a1ad',
+        'set': '1585386959984-a4155224a1ad',
+        'labial': '1522335789203-aabd1fc54bc9',
+        'lipstick': '1522335789203-aabd1fc54bc9',
+        'espejo': '1601582581083-1b1f3d7b4b6f',
+        'mirror': '1601582581083-1b1f3d7b4b6f',
+        'esponja': '1596461404969-dace20f7fdd6',
+        'blender': '1596461404969-dace20f7fdd6',
+        'rubor': '1526045612212-70caf35c14df',
+        'blush': '1526045612212-70caf35c14df',
+        'base': '1571781926291-c477ebfd024b',
+        'foundation': '1571781926291-c477ebfd024b',
+        'máscara': '1596462502278-27bfdc403348',
+        'mascara': '1596462502278-27bfdc403348',
+        'pestañas': '1596462502278-27bfdc403348',
+        'corrector': '1629196914375-9e3c6bf25ef4',
+        'concealer': '1629196914375-9e3c6bf25ef4',
+        'polvo': '1629196914375-9e3c6bf25ef4',
+        'powder': '1629196914375-9e3c6bf25ef4',
+        'iluminador': '1571781926291-c477ebfd024b',
+        'highlighter': '1571781926291-c477ebfd024b',
+        'estuche': '1556228578-8c89e6adf883',
+        'kit': '1556228578-8c89e6adf883',
+        'organizador': '1556228578-8c89e6adf883',
+        'limpiador': '1596461404969-dace20f7fdd6',
+        'rizador': '1585386959984-a4155224a1ad',
+        'delineador': '1596462502278-27bfdc403348',
+        'eyeliner': '1596462502278-27bfdc403348',
+        'líquidas': '1544005313-94ddf0286df2',
+        'perfilador': '1629196914375-9e3c6bf25ef4',
+        'fijador': '1571781926291-c477ebfd024b',
+        'spray': '1571781926291-c477ebfd024b'
+      };
+      
+      // Buscar palabra clave en el título
+      for(const [keyword, imageId] of Object.entries(imageMap)){
+        if(title.includes(keyword)){
+          return `${baseUrl}${imageId}?w=800&q=80`;
+        }
+      }
+      
+      // Imagen por defecto según categoría
+      if(category === 'maquillajes'){
+        return 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&q=80';
+      } else if(category === 'accesorios'){
+        return 'https://images.unsplash.com/photo-1585386959984-a4155224a1ad?w=800&q=80';
+      }
+      
+      // Imagen genérica de maquillaje
+      return 'https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=800&q=80';
+    }
+    
+    // Actualizar productos sin imagen
+    PRODUCTS.forEach(product => {
+      if(!product.img || product.img.includes('placeholder')){
+        product.img = getProductImage(product.title, product.category);
+      }
+    });
 
     // util
     function money(v){ return '$' + Number(v).toFixed(2); }
-    function saveCart(){ localStorage.setItem('daisybee_cart', JSON.stringify(CART)); updateCartUI(); }
+    function saveCart(){ 
+      localStorage.setItem('daisybee_cart', JSON.stringify(CART)); 
+      updateCartUI(); 
+    }
+    function clearCart(){
+      CART = [];
+      localStorage.removeItem('daisybee_cart');
+      updateCartUI();
+    }
 
     function findProduct(id){ return PRODUCTS.find(p => p.id === id); }
 
@@ -360,6 +640,120 @@
 
     function escapeHtml(str){ return String(str).replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;'); }
 
+    // ====== Historial de Pedidos ======
+    function saveOrderToHistory(orderData){
+      const orders = JSON.parse(localStorage.getItem('daisybee_orders') || '[]');
+      const order = {
+        ...orderData,
+        status: 'pendiente',
+        createdAt: new Date().toISOString(),
+        statusHistory: [
+          { status: 'pendiente', date: new Date().toISOString() }
+        ]
+      };
+      orders.unshift(order); // Agregar al inicio
+      localStorage.setItem('daisybee_orders', JSON.stringify(orders));
+      updateOrderHistory();
+      
+      // Simular cambio de estado después de un tiempo
+      setTimeout(() => updateOrderStatus(order.orderNum, 'empacando'), 3000);
+      setTimeout(() => updateOrderStatus(order.orderNum, 'enviando'), 8000);
+    }
+    
+    function updateOrderStatus(orderNum, newStatus){
+      const orders = JSON.parse(localStorage.getItem('daisybee_orders') || '[]');
+      const order = orders.find(o => o.orderNum === orderNum);
+      if(order && order.status !== newStatus){
+        order.status = newStatus;
+        order.statusHistory.push({
+          status: newStatus,
+          date: new Date().toISOString()
+        });
+        localStorage.setItem('daisybee_orders', JSON.stringify(orders));
+        updateOrderHistory();
+      }
+    }
+    
+    function updateOrderHistory(){
+      const orders = JSON.parse(localStorage.getItem('daisybee_orders') || '[]');
+      const container = document.getElementById('ordersHistoryList');
+      if(!container) return;
+      
+      if(orders.length === 0){
+        container.innerHTML = '<div class="card" style="padding:20px;text-align:center"><p class="small">No tienes pedidos aún. ¡Haz tu primera compra!</p></div>';
+        return;
+      }
+      
+      container.innerHTML = '';
+      orders.forEach(order => {
+        const statusLabels = {
+          'pendiente': '⏳ Pendiente',
+          'empacando': '📦 Empacándose',
+          'enviando': '🚚 Enviándose',
+          'entregado': '✅ Entregado'
+        };
+        
+        let productsHtml = '';
+        order.cartCopy.forEach(item => {
+          const p = findProduct(item.id);
+          if(p){
+            productsHtml += `
+              <div class="order-product-item">
+                <img src="${p.img}?w=200&q=60" alt="${escapeHtml(p.title)}">
+                <div style="flex:1">
+                  <strong>${escapeHtml(p.title)}</strong>
+                  <div class="small">Cantidad: ${item.qty} • ${money(p.onSale ? p.salePrice : p.price)} c/u</div>
+                </div>
+              </div>
+            `;
+          }
+        });
+        
+        const orderDate = new Date(order.createdAt).toLocaleString('es-ES');
+        const paypalInfo = order.paypalTransactionId ? `<div class="small" style="margin-top:8px">Transacción PayPal: <strong>${order.paypalTransactionId}</strong></div>` : '';
+        
+        let paymentMethodText = '';
+        if(order.paymentMethod === 'paypal'){
+          paymentMethodText = '🅿️ PayPal';
+        } else if(order.paymentMethod === 'tarjeta'){
+          paymentMethodText = '💳 Tarjeta';
+        } else if(order.paymentMethod === 'efectivo'){
+          paymentMethodText = '💵 Efectivo';
+        } else {
+          paymentMethodText = order.paymentMethod || 'No especificado';
+        }
+        
+        container.innerHTML += `
+          <div class="order-card">
+            <div class="order-header">
+              <div>
+                <h3 style="margin:0">Pedido ${order.orderNum}</h3>
+                <div class="small" style="margin-top:4px">${orderDate}</div>
+              </div>
+              <span class="order-status ${order.status}">${statusLabels[order.status] || order.status}</span>
+            </div>
+            <div>
+              <div><strong>Cliente:</strong> ${escapeHtml(order.name)}</div>
+              <div class="small" style="margin-top:4px"><strong>Dirección:</strong> ${escapeHtml(order.address)}</div>
+              <div class="small" style="margin-top:4px"><strong>Método de pago:</strong> ${paymentMethodText}</div>
+              ${paypalInfo}
+            </div>
+            <div class="order-products">
+              ${productsHtml}
+            </div>
+            <div style="margin-top:12px;padding-top:12px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center">
+              <div>
+                <div class="small">Subtotal: ${money(order.subtotal)}</div>
+                <div class="small">Envío: ${money(order.shipping)}</div>
+                <div class="small">Impuestos: ${money(order.taxes)}</div>
+                <div style="margin-top:4px"><strong>Total: ${money(order.total)}</strong></div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
     function initViews(){
       renderGrid('homeProducts', p => p.featured || false);
       renderGrid('productsGrid', _ => true);
@@ -370,28 +764,65 @@
       renderHomeReviews();
       updateAllReviewsList();
       updateCartUI();
+      updateOrderHistory();
     }
 
+    // ====== Funciones auxiliares para mostrar/ocultar elementos ======
+    function showElement(id){
+      const el = document.getElementById(id);
+      if(el) {
+        el.classList.remove('hidden');
+        // Si el elemento tiene una clase que oculta por defecto (como checkout-area), establecer display directamente
+        if(el.classList.contains('checkout-area') || el.classList.contains('order-confirmation-area')) {
+          el.style.display = 'block';
+        }
+      }
+    }
+    function hideElement(id){
+      const el = document.getElementById(id);
+      if(el) {
+        el.classList.add('hidden');
+        // También establecer display none para elementos con clases especiales
+        if(el.classList.contains('checkout-area') || el.classList.contains('order-confirmation-area') || el.classList.contains('card-payment-form')) {
+          el.style.display = 'none';
+        }
+      }
+    }
+    function toggleElement(id, show){
+      if(show) showElement(id);
+      else hideElement(id);
+    }
+    
     // ====== Navegación SPA simple ======
     function navigate(page){
-      document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
       const el = document.getElementById('page-' + page);
-      if(el) el.style.display = 'block';
+      if(el) el.classList.remove('hidden');
       document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
       const nav = document.querySelector('.nav-link[data-page="'+page+'"]');
       if(nav) nav.classList.add('active');
       window.scrollTo(0,0);
+      
+      // Actualizar historial si se navega a esa página
+      if(page === 'historial'){
+        updateOrderHistory();
+      }
     }
 
-    document.querySelectorAll('.nav-link').forEach(a => {
-      a.addEventListener('click', (e) => {
-        e.preventDefault();
-        navigate(a.dataset.page);
+    // Navegación - se inicializa después de que el DOM esté listo
+    function initNavigation() {
+      document.querySelectorAll('.nav-link').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          navigate(a.dataset.page);
+        });
       });
-    });
+    }
 
     // ====== Búsqueda simple ======
-    document.getElementById('searchBtn').addEventListener('click', () => {
+    const searchBtn = document.getElementById('searchBtn');
+    if(searchBtn) {
+      searchBtn.addEventListener('click', () => {
       const q = document.getElementById('searchInput').value.trim().toLowerCase();
       if(!q) return navigate('productos');
       const results = PRODUCTS.filter(p => p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q));
@@ -415,17 +846,42 @@
         `;
       });
       navigate('productos');
-    });
+      });
+    }
 
     // ====== Carrito UI y lógica ======
     function updateCartUI(){
-      const count = CART.reduce((s, it) => s + it.qty, 0);
-      document.getElementById('cartCount').textContent = count;
+      // Asegurar que CART esté sincronizado con localStorage
+      const storedCart = localStorage.getItem('daisybee_cart');
+      if(storedCart){
+        try {
+          const parsed = JSON.parse(storedCart);
+          if(Array.isArray(parsed)){
+            CART = parsed;
+          } else {
+            CART = [];
+            localStorage.removeItem('daisybee_cart');
+          }
+        } catch(e){
+          CART = [];
+          localStorage.removeItem('daisybee_cart');
+        }
+      } else {
+        CART = [];
+      }
+      
+      const count = CART.reduce((s, it) => s + (it.qty || 0), 0);
+      const countEl = document.getElementById('cartCount');
+      if(countEl) countEl.textContent = count;
+      
       const list = document.getElementById('cartItemsList');
+      if(!list) return;
+      
       list.innerHTML = '';
-      if(CART.length === 0){
+      if(CART.length === 0 || count === 0){
         list.innerHTML = '<div style="padding:12px;color:var(--muted)">Tu carrito está vacío.</div>';
-        document.getElementById('cartSubtotal').textContent = '$0.00';
+        const subtotalEl = document.getElementById('cartSubtotal');
+        if(subtotalEl) subtotalEl.textContent = '$0.00';
         return;
       }
       CART.forEach(item => {
@@ -472,8 +928,10 @@
       showCart();
     }
 
-    // eventos delegados: botones "Agregar"
-    document.body.addEventListener('click', (e) => {
+    // eventos delegados: botones "Agregar" - se inicializa después de que el DOM esté listo
+    function initBodyClickHandlers() {
+      if(!document.body) return;
+      document.body.addEventListener('click', (e) => {
       if(e.target.closest('.add-to-cart')){
         const id = e.target.closest('.add-to-cart').dataset.id;
         addToCart(id, 1);
@@ -486,11 +944,84 @@
       if(e.target.id === 'closeCartBtn') hideCart();
       if(e.target.id === 'continueShopping') { hideCart(); navigate('productos'); }
       if(e.target.id === 'proceedCheckout') showCheckoutForm();
-      if(e.target.id === 'finishBtn') { hideCart(); navigate('productos'); }
-    });
+      if(e.target.id === 'finishBtn') { 
+        // Ocultar completamente el área de confirmación y checkout
+        hideElement('orderConfirmationArea');
+        hideElement('checkoutArea');
+        
+        // Resetear completamente el estado del panel del carrito
+        const cartFooter = document.getElementById('cartFooter');
+        if(cartFooter) {
+          cartFooter.style.display = 'flex';
+        }
+        
+        // Limpiar formulario de checkout
+        const checkoutForm = document.getElementById('checkoutForm');
+        if(checkoutForm) checkoutForm.reset();
+        const paymentMethod = document.getElementById('paymentMethod');
+        if(paymentMethod) paymentMethod.value = '';
+        const paypalContainer = document.getElementById('paypal-button-container');
+        if(paypalContainer) paypalContainer.innerHTML = '';
+        hideElement('paypal-button-container');
+        hideElement('cardPaymentInfo');
+        hideElement('cashPaymentInfo');
+        
+        // Limpiar completamente el formulario de tarjeta
+        const cardFormElement = document.getElementById('cardPaymentFormElement');
+        if(cardFormElement) {
+          cardFormElement.reset();
+        }
+        // Asegurar que los campos de tarjeta estén vacíos
+        const cardNumber = document.getElementById('cardNumber');
+        const cardExpiry = document.getElementById('cardExpiry');
+        const cardCVV = document.getElementById('cardCVV');
+        const cardHolderNameInput = document.getElementById('cardHolderName');
+        if(cardNumber) cardNumber.value = '';
+        if(cardExpiry) cardExpiry.value = '';
+        if(cardCVV) cardCVV.value = '';
+        if(cardHolderNameInput) cardHolderNameInput.value = '';
+        // Ocultar el formulario de tarjeta completamente
+        const cardForm = document.getElementById('cardPaymentForm');
+        if(cardForm) {
+          cardForm.style.display = 'none';
+          cardForm.classList.add('hidden');
+        }
+        
+        // Limpiar PayPal si existe
+        if(paypalButtons) {
+          try {
+            paypalButtons.close();
+          } catch(e) {}
+          paypalButtons = null;
+        }
+        
+        // Limpiar variables globales
+        currentOrderData = null;
+        lastWhatsAppMessage = null;
+        
+        // Asegurar que el carrito esté completamente vacío
+        clearCart();
+        
+        // Cerrar el panel del carrito
+        hideCart();
+        
+        // Navegar a productos para que el usuario pueda seguir comprando
+        navigate('productos'); 
+      }
+      if(e.target.id === 'resendWhatsAppBtn' && lastWhatsAppMessage) {
+        sendOrderToWhatsApp(lastWhatsAppMessage);
+      }
+      if(e.target.id === 'whatsappFloatBtn'){
+        e.preventDefault();
+        openWhatsAppContact();
+      }
+      });
+    }
 
     // Quitar item / qty
-    document.getElementById('cartItemsList').addEventListener('click', (e) => {
+    const cartItemsList = document.getElementById('cartItemsList');
+    if(cartItemsList) {
+      cartItemsList.addEventListener('click', (e) => {
       if(e.target.closest('.remove-item')){
         const id = e.target.dataset.id;
         CART = CART.filter(i => i.id !== id);
@@ -511,10 +1042,13 @@
         else alert('Límite de stock alcanzado');
         saveCart();
       }
-    });
+      });
+    }
 
     // input qty directo
-    document.getElementById('cartItemsList').addEventListener('change', (e) => {
+    const cartItemsListForChange = document.getElementById('cartItemsList');
+    if(cartItemsListForChange) {
+      cartItemsListForChange.addEventListener('change', (e) => {
       if(e.target.matches('input[type="text"]')){
         const id = e.target.dataset.id;
         let v = parseInt(e.target.value) || 1;
@@ -524,70 +1058,758 @@
         const it = CART.find(i=>i.id===id);
         if(it){ it.qty = v; saveCart(); }
       }
-    });
+      });
+    }
 
     // Mostrar/ocultar panel carrito
     function showCart(){
-      document.getElementById('cartPanel').style.display = 'flex';
-      document.getElementById('cartPanel').setAttribute('aria-hidden','false');
+      const panel = document.getElementById('cartPanel');
+      panel.style.display = 'flex';
+      panel.setAttribute('aria-hidden','false');
+      panel.setAttribute('aria-modal','true');
+      // Restaurar tabindex de elementos focusables
+      const focusableElements = panel.querySelectorAll('button, input, select, textarea, a');
+      focusableElements.forEach(el => {
+        if(el.hasAttribute('data-tabindex')){
+          el.setAttribute('tabindex', el.getAttribute('data-tabindex'));
+          el.removeAttribute('data-tabindex');
+        } else if(!el.hasAttribute('tabindex')){
+          el.removeAttribute('tabindex');
+        }
+      });
       updateCartUI();
     }
     function hideCart(){
-      document.getElementById('cartPanel').style.display = 'none';
-      document.getElementById('cartPanel').setAttribute('aria-hidden','true');
+      const panel = document.getElementById('cartPanel');
+      panel.style.display = 'none';
+      panel.setAttribute('aria-hidden','true');
+      panel.setAttribute('aria-modal','false');
+      // Guardar y remover tabindex de elementos focusables
+      const focusableElements = panel.querySelectorAll('button, input, select, textarea, a');
+      focusableElements.forEach(el => {
+        const currentTabindex = el.getAttribute('tabindex');
+        if(currentTabindex !== null && currentTabindex !== '-1'){
+          el.setAttribute('data-tabindex', currentTabindex);
+        }
+        el.setAttribute('tabindex', '-1');
+      });
+    }
+
+    // Generar mensaje de WhatsApp con el pedido
+    function generateWhatsAppMessage(name, email, address, orderNum, cartItems, subtotal, shipping, taxes, total){
+      let message = `🛍️ *NUEVO PEDIDO - Daisy & Bee*\n\n`;
+      message += `*Pedido:* ${orderNum}\n`;
+      message += `*Cliente:* ${name}\n`;
+      message += `*Email:* ${email}\n`;
+      message += `*Dirección:* ${address}\n\n`;
+      message += `*Productos:*\n`;
+      cartItems.forEach(item => {
+        const p = findProduct(item.id);
+        const price = p.onSale ? p.salePrice : p.price;
+        message += `• ${p.title} x${item.qty} - ${money(price)} c/u\n`;
+      });
+      message += `\n*Resumen:*\n`;
+      message += `Subtotal: ${money(subtotal)}\n`;
+      message += `Envío: ${money(shipping)}\n`;
+      message += `Impuestos: ${money(taxes)}\n`;
+      message += `*TOTAL: ${money(total)}*\n\n`;
+      message += `Fecha: ${new Date().toLocaleString('es-ES')}`;
+      return encodeURIComponent(message);
+    }
+
+    // Generar código de pedido único
+    function generateOrderCode(){
+      const timestamp = Date.now();
+      const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+      const date = new Date();
+      const dateStr = date.getFullYear().toString().slice(-2) + 
+                     (date.getMonth() + 1).toString().padStart(2, '0') + 
+                     date.getDate().toString().padStart(2, '0');
+      return `DB-${dateStr}-${random}-${timestamp.toString().slice(-6)}`;
+    }
+
+    // Abrir WhatsApp Web con el mensaje del pedido (en segundo plano)
+    function sendOrderToWhatsApp(message){
+      const whatsappUrl = `https://web.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${message}`;
+      // Crear un enlace oculto y hacer clic programático para enviar en segundo plano
+      const link = document.createElement('a');
+      link.href = whatsappUrl;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      
+      // Hacer clic programático (esto abrirá WhatsApp Web en una nueva pestaña pero no redirigirá la actual)
+      link.click();
+      
+      // Remover el enlace después de un momento
+      setTimeout(() => {
+        if(link.parentNode) {
+          link.parentNode.removeChild(link);
+        }
+      }, 100);
+    }
+
+    // Abrir WhatsApp Web con mensaje de contacto general
+    function openWhatsAppContact(){
+      const message = encodeURIComponent('Hola! Me interesa conocer más sobre los productos de Daisy & Bee 🌼');
+      const whatsappUrl = `https://web.whatsapp.com/send?phone=${WHATSAPP_NUMBER}&text=${message}`;
+      window.open(whatsappUrl, '_blank');
+    }
+
+    // Cargar SDK de PayPal dinámicamente
+    function loadPayPalSDK(callback){
+      if(typeof paypal !== 'undefined'){
+        callback();
+        return;
+      }
+      
+      if(PAYPAL_CLIENT_ID === 'YOUR_PAYPAL_CLIENT_ID'){
+        callback(); // Continuar sin PayPal
+        return;
+      }
+      
+      const script = document.createElement('script');
+      script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD&intent=capture`;
+      script.onload = callback;
+      script.onerror = function(){
+        console.error('Error al cargar PayPal SDK');
+        callback();
+      };
+      document.head.appendChild(script);
+    }
+
+    // Inicializar PayPal
+    function initPayPal(total, orderId){
+      const container = document.getElementById('paypal-button-container');
+      container.innerHTML = '<p class="small" style="color:var(--muted);padding:8px">Cargando PayPal...</p>';
+      
+      if(paypalButtons) {
+        paypalButtons.close();
+        paypalButtons = null;
+      }
+
+      loadPayPalSDK(function(){
+        if(typeof paypal === 'undefined' || PAYPAL_CLIENT_ID === 'YOUR_PAYPAL_CLIENT_ID'){
+          container.innerHTML = '<p class="small" style="color:var(--muted);padding:8px">PayPal no configurado. Usa el botón de WhatsApp para pagar.</p>';
+          return;
+        }
+
+      paypalButtons = paypal.Buttons({
+        createOrder: function(data, actions) {
+          // Validar que los campos estén completos
+          const name = document.getElementById('cfName').value.trim();
+          const email = document.getElementById('cfEmail').value.trim();
+          const address = document.getElementById('cfAddress').value.trim();
+          
+          if(!name || !email || !address){
+            alert('Por favor, completa todos los campos del formulario antes de pagar con PayPal.');
+            return;
+          }
+          
+          return actions.order.create({
+            purchase_units: [{
+              reference_id: orderId,
+              description: `Pedido Daisy & Bee`,
+              amount: {
+                value: total.toFixed(2),
+                currency_code: 'USD'
+              }
+            }],
+            application_context: {
+              brand_name: 'Daisy & Bee',
+              landing_page: 'BILLING',
+              user_action: 'PAY_NOW'
+            }
+          });
+        },
+        onApprove: function(data, actions) {
+          return actions.order.capture().then(function(details) {
+            // Procesar el pago exitoso
+            if(details.status === 'COMPLETED'){
+              processOrderAfterPayment(details.id);
+            }
+          });
+        },
+        onError: function(err) {
+          console.error('Error en PayPal:', err);
+          alert('Hubo un error al procesar el pago. Por favor, intenta con otro método de pago.');
+        },
+        onCancel: function(data) {
+          console.log('Pago cancelado por el usuario');
+        }
+      });
+      paypalButtons.render('#paypal-button-container');
+      }); // Cerrar callback de loadPayPalSDK
+    }
+
+    // Procesar pedido después del pago de PayPal
+    function processOrderAfterPayment(paypalTransactionId){
+      // Obtener datos del formulario actual
+      const name = document.getElementById('cfName').value.trim();
+      const email = document.getElementById('cfEmail').value.trim();
+      const address = document.getElementById('cfAddress').value.trim();
+      
+      if(!name || !email || !address){
+        alert('Error: Datos del formulario incompletos');
+        return;
+      }
+      
+      // Procesar el pedido con PayPal
+      processConfirmedOrder('paypal', paypalTransactionId);
     }
 
     // Mostrar checkout
     function showCheckoutForm(){
-      if(CART.length === 0) { alert('Tu carrito está vacío'); return; }
-      document.getElementById('checkoutArea').style.display = 'block';
-      document.getElementById('cartFooter').style.display = 'none';
-      document.getElementById('orderConfirmationArea').style.display = 'none';
-      setTimeout(()=>document.getElementById('cfName').focus(),50);
+      // Verificar que el carrito tenga items
+      updateCartUI(); // Sincronizar primero
+      if(CART.length === 0 || CART.reduce((s, it) => s + (it.qty || 0), 0) === 0) { 
+        alert('Tu carrito está vacío'); 
+        return; 
+      }
+      
+      // Limpiar datos del pedido anterior y formulario completamente
+      currentOrderData = null;
+      lastWhatsAppMessage = null;
+      document.getElementById('checkoutForm').reset();
+      document.getElementById('paymentMethod').value = '';
+      document.getElementById('paypal-button-container').innerHTML = '';
+      hideElement('paypal-button-container');
+      hideElement('cardPaymentInfo');
+      hideElement('cashPaymentInfo');
+      
+      // Limpiar y ocultar completamente el formulario de tarjeta
+      const cardFormElement = document.getElementById('cardPaymentFormElement');
+      if(cardFormElement) {
+        cardFormElement.reset();
+      }
+      const cardNumber = document.getElementById('cardNumber');
+      const cardExpiry = document.getElementById('cardExpiry');
+      const cardCVV = document.getElementById('cardCVV');
+      const cardHolderNameInput = document.getElementById('cardHolderName');
+      if(cardNumber) cardNumber.value = '';
+      if(cardExpiry) cardExpiry.value = '';
+      if(cardCVV) cardCVV.value = '';
+      if(cardHolderNameInput) cardHolderNameInput.value = '';
+      const cardForm = document.getElementById('cardPaymentForm');
+      if(cardForm) {
+        cardForm.style.display = 'none';
+        cardForm.classList.add('hidden');
+      }
+      
+      // Limpiar botones de PayPal
+      if(paypalButtons) {
+        try {
+          paypalButtons.close();
+        } catch(e) {}
+        paypalButtons = null;
+      }
+      
+      // Mostrar el área de checkout
+      const checkoutArea = document.getElementById('checkoutArea');
+      if(checkoutArea) {
+        checkoutArea.classList.remove('hidden');
+        checkoutArea.style.display = 'block';
+      }
+      
+      // Ocultar el footer del carrito
+      const cartFooter = document.getElementById('cartFooter');
+      if(cartFooter) cartFooter.style.display = 'none';
+      
+      // Ocultar área de confirmación si está visible
+      hideElement('orderConfirmationArea');
+      hideElement('resendWhatsAppBtn');
+      
+      // Asegurar que el panel del carrito esté visible
+      const panel = document.getElementById('cartPanel');
+      if(panel && panel.style.display === 'none') {
+        showCart();
+      }
+      
+      setTimeout(()=>{
+        const cfName = document.getElementById('cfName');
+        if(cfName) cfName.focus();
+      },50);
     }
-    document.getElementById('backToCart').addEventListener('click', () => {
-      document.getElementById('checkoutArea').style.display = 'none';
-      document.getElementById('cartFooter').style.display = 'flex';
-    });
+    const backToCartBtn = document.getElementById('backToCart');
+    if(backToCartBtn) {
+      backToCartBtn.addEventListener('click', () => {
+      hideElement('checkoutArea');
+      const cartFooter = document.getElementById('cartFooter');
+      if(cartFooter) cartFooter.style.display = 'flex';
+      document.getElementById('paypal-button-container').innerHTML = '';
+      hideElement('paypal-button-container');
+      hideElement('cardPaymentInfo');
+      hideElement('cashPaymentInfo');
+      
+      // Limpiar y ocultar completamente el formulario de tarjeta
+      const cardFormElement = document.getElementById('cardPaymentFormElement');
+      if(cardFormElement) {
+        cardFormElement.reset();
+      }
+      const cardNumber = document.getElementById('cardNumber');
+      const cardExpiry = document.getElementById('cardExpiry');
+      const cardCVV = document.getElementById('cardCVV');
+      const cardHolderNameInput = document.getElementById('cardHolderName');
+      if(cardNumber) cardNumber.value = '';
+      if(cardExpiry) cardExpiry.value = '';
+      if(cardCVV) cardCVV.value = '';
+      if(cardHolderNameInput) cardHolderNameInput.value = '';
+      const cardForm = document.getElementById('cardPaymentForm');
+      if(cardForm) {
+        cardForm.style.display = 'none';
+        cardForm.classList.add('hidden');
+      }
+      
+      currentOrderData = null;
+      if(paypalButtons) {
+        try {
+          paypalButtons.close();
+        } catch(e) {}
+        paypalButtons = null;
+      }
+      });
+    }
 
-    // Checkout submit (simulado)
-    document.getElementById('checkoutForm').addEventListener('submit', (e) => {
-      e.preventDefault();
+    // Manejar cambio de método de pago
+    const paymentMethodSelect = document.getElementById('paymentMethod');
+    if(paymentMethodSelect) {
+      paymentMethodSelect.addEventListener('change', (e) => {
+      const method = e.target.value;
+      hideElement('paypal-button-container');
+      hideElement('cardPaymentInfo');
+      hideElement('cashPaymentInfo');
+      
+      if(paypalButtons) {
+        try {
+          paypalButtons.close();
+        } catch(e) {}
+        paypalButtons = null;
+      }
+      
+      if(method === 'paypal'){
+        showElement('paypal-button-container');
+        // Inicializar PayPal solo si los campos están completos
+        const name = document.getElementById('cfName').value.trim();
+        const email = document.getElementById('cfEmail').value.trim();
+        const address = document.getElementById('cfAddress').value.trim();
+        if(name && email && address){
+          initPayPalForCheckout();
+        }
+      } else if(method === 'tarjeta'){
+        showElement('cardPaymentInfo');
+        hideElement('cardPaymentForm');
+      } else if(method === 'efectivo'){
+        showElement('cashPaymentInfo');
+      }
+      });
+    }
+
+    // Procesar pedido confirmado
+    function processConfirmedOrder(paymentMethod, paypalTransactionId = null, cardHolderName = null){
       const name = document.getElementById('cfName').value.trim();
       const email = document.getElementById('cfEmail').value.trim();
       const address = document.getElementById('cfAddress').value.trim();
-      if(!name || !email || !address){ alert('Completa todos los campos'); return; }
+      
+      if(!name || !email || !address){ 
+        alert('Completa todos los campos'); 
+        return false;
+      }
+      
+      if(!paymentMethod){
+        alert('Selecciona un método de pago');
+        return false;
+      }
 
-      const orderNum = 'DB-' + Math.floor(1000 + Math.random()*9000) + '-' + Date.now().toString().slice(-4);
+      // Generar código de pedido ÚNICO solo una vez al confirmar
+      const orderNum = generateOrderCode();
       const subtotal = CART.reduce((s,it) => {
-        const p = findProduct(it.id); const price = p.onSale ? p.salePrice : p.price;
+        const p = findProduct(it.id); 
+        const price = p.onSale ? p.salePrice : p.price;
         return s + price * it.qty;
       },0);
       const shipping = subtotal > 50 ? 0 : 5.99;
       const taxes = +(subtotal * 0.12).toFixed(2);
       const total = +(subtotal + shipping + taxes).toFixed(2);
 
-      document.getElementById('orderSummaryText').innerHTML = `
-        Pedido <strong>${orderNum}</strong><br>
-        ${CART.length} producto(s) — Subtotal ${money(subtotal)} • Envío ${money(shipping)} • Impuestos ${money(taxes)}<br>
-        <strong>Total ${money(total)}</strong><br>
-        Un correo de confirmación será enviado a <strong>${escapeHtml(email)}</strong> (simulado).
-      `;
+      // Guardar una copia del carrito antes de limpiarlo
+      const cartCopy = JSON.parse(JSON.stringify(CART));
 
-      CART = [];
-      saveCart();
-      document.getElementById('checkoutArea').style.display = 'none';
-      document.getElementById('orderConfirmationArea').style.display = 'block';
-      document.getElementById('cartFooter').style.display = 'none';
+      // Guardar pedido en historial
+      const orderData = {
+        name,
+        email,
+        address,
+        orderNum,
+        cartCopy: JSON.parse(JSON.stringify(cartCopy)),
+        subtotal,
+        shipping,
+        taxes,
+        total,
+        paymentMethod
+      };
+      
+      if(paypalTransactionId){
+        orderData.paypalTransactionId = paypalTransactionId;
+      }
+      
+      // Guardar solo el nombre del titular de la tarjeta (NO los datos sensibles)
+      if(paymentMethod === 'tarjeta' && cardHolderName){
+        orderData.cardHolderName = cardHolderName;
+        // NO guardamos: número de tarjeta, CVV, fecha de expiración
+      }
+      
+      saveOrderToHistory(orderData);
+
+      // Generar mensaje de WhatsApp
+      let message = `🛍️ *NUEVO PEDIDO - Daisy & Bee*\n\n`;
+      message += `*Pedido:* ${orderNum}\n`;
+      if(paypalTransactionId){
+        message += `*Transacción PayPal:* ${paypalTransactionId}\n`;
+        message += `*Método de Pago:* PayPal ✅\n`;
+      } else if(paymentMethod === 'tarjeta'){
+        message += `*Método de Pago:* Tarjeta 💳\n`;
+        if(cardHolderName){
+          message += `*Titular de la Tarjeta:* ${cardHolderName}\n`;
+        }
+        message += `✅ Pago procesado exitosamente\n`;
+      } else if(paymentMethod === 'efectivo'){
+        message += `*Método de Pago:* Efectivo 💵\n`;
+      }
+      message += `*Cliente:* ${name}\n`;
+      message += `*Email:* ${email}\n`;
+      message += `*Dirección:* ${address}\n\n`;
+      message += `*Productos:*\n`;
+      cartCopy.forEach(item => {
+        const p = findProduct(item.id);
+        const price = p.onSale ? p.salePrice : p.price;
+        message += `• ${p.title} x${item.qty} - ${money(price)} c/u\n`;
+      });
+      message += `\n*Resumen:*\n`;
+      message += `Subtotal: ${money(subtotal)}\n`;
+      message += `Envío: ${money(shipping)}\n`;
+      message += `Impuestos: ${money(taxes)}\n`;
+      message += `*TOTAL: ${money(total)}*\n\n`;
+      if(paypalTransactionId){
+        message += `✅ Pago confirmado vía PayPal\n`;
+      }
+      message += `Fecha: ${new Date().toLocaleString('es-ES')}`;
+      
+      const whatsappMessage = encodeURIComponent(message);
+      lastWhatsAppMessage = whatsappMessage;
+      
+      // Enviar a WhatsApp
+      sendOrderToWhatsApp(whatsappMessage);
+
+      // Mostrar confirmación
+      let confirmationText = `
+        Pedido <strong>${orderNum}</strong><br>
+        ${cartCopy.length} producto(s) — Subtotal ${money(subtotal)} • Envío ${money(shipping)} • Impuestos ${money(taxes)}<br>
+        <strong>Total ${money(total)}</strong><br>
+        Método de pago: `;
+      
+      if(paypalTransactionId){
+        confirmationText += `<strong>PayPal</strong><br>Transacción: <strong>${paypalTransactionId}</strong><br>✅ Pago confirmado exitosamente.<br>`;
+      } else if(paymentMethod === 'tarjeta'){
+        confirmationText += `<strong>Tarjeta</strong><br>💳 Pago procesado exitosamente.`;
+        if(cardHolderName){
+          confirmationText += `<br>Titular: <strong>${escapeHtml(cardHolderName)}</strong>`;
+        }
+        confirmationText += `<br>`;
+      } else if(paymentMethod === 'efectivo'){
+        confirmationText += `<strong>Efectivo</strong><br>💵 Pago al momento de la entrega.<br>`;
+      }
+      
+      confirmationText += `Se ha abierto WhatsApp para enviar los detalles del pedido.<br>`;
+      if(!paypalTransactionId){
+        confirmationText += `Un correo de confirmación será enviado a <strong>${escapeHtml(email)}</strong> (simulado).`;
+      }
+
+      document.getElementById('orderSummaryText').innerHTML = confirmationText;
+
+      // VACIAR COMPLETAMENTE EL CARRITO después del pedido
+      clearCart(); // Esta función vacía CART, elimina de localStorage y actualiza UI
+      
+      // Limpiar TODOS los datos del pedido
+      currentOrderData = null;
+      lastWhatsAppMessage = null;
+      
+      // Limpiar formulario de checkout
+      document.getElementById('checkoutForm').reset();
+      document.getElementById('paymentMethod').value = '';
+      
+      // Limpiar completamente el formulario de tarjeta
+      const cardFormElement = document.getElementById('cardPaymentFormElement');
+      if(cardFormElement) {
+        cardFormElement.reset();
+      }
+      // Asegurar que los campos de tarjeta estén vacíos
+      const cardNumber = document.getElementById('cardNumber');
+      const cardExpiry = document.getElementById('cardExpiry');
+      const cardCVV = document.getElementById('cardCVV');
+      const cardHolderNameInput = document.getElementById('cardHolderName');
+      if(cardNumber) cardNumber.value = '';
+      if(cardExpiry) cardExpiry.value = '';
+      if(cardCVV) cardCVV.value = '';
+      if(cardHolderNameInput) cardHolderNameInput.value = '';
+      
+      // Limpiar elementos de PayPal
+      document.getElementById('paypal-button-container').innerHTML = '';
+      hideElement('paypal-button-container');
+      hideElement('cardPaymentInfo');
+      hideElement('cashPaymentInfo');
+      
+      if(paypalButtons) {
+        try {
+          paypalButtons.close();
+        } catch(e) {}
+        paypalButtons = null;
+      }
+      
+      // Ocultar checkout y formulario de tarjeta ANTES de mostrar confirmación
+      hideElement('checkoutArea');
+      
+      // Asegurar que el formulario de tarjeta esté completamente oculto
+      const cardForm = document.getElementById('cardPaymentForm');
+      if(cardForm) {
+        // Forzar ocultación con múltiples métodos para asegurar que funcione
+        cardForm.style.display = 'none';
+        cardForm.style.visibility = 'hidden';
+        cardForm.classList.add('hidden');
+        cardForm.setAttribute('aria-hidden', 'true');
+      }
+      
+      // Ocultar también el área de información de tarjeta si está visible
+      hideElement('cardPaymentInfo');
+      
+      // Ahora mostrar la confirmación
+      showElement('orderConfirmationArea');
+      const cartFooter = document.getElementById('cartFooter');
+      if(cartFooter) cartFooter.style.display = 'none';
+      const resendBtn = document.getElementById('resendWhatsAppBtn');
+      if(resendBtn) resendBtn.style.display = 'inline-block';
+      
+      // Asegurar que el panel del carrito esté visible para mostrar la confirmación
+      const panel = document.getElementById('cartPanel');
+      if(panel && panel.style.display === 'none') {
+        showCart();
+      }
+      
+      // Asegurar que la UI del carrito esté actualizada (ya se hace en clearCart, pero por si acaso)
       updateCartUI();
-    });
+      
+      return true;
+    }
+
+    // Inicializar PayPal para checkout
+    function initPayPalForCheckout(){
+      const subtotal = CART.reduce((s,it) => {
+        const p = findProduct(it.id);
+        const price = p.onSale ? p.salePrice : p.price;
+        return s + price * it.qty;
+      },0);
+      const shipping = subtotal > 50 ? 0 : 5.99;
+      const taxes = +(subtotal * 0.12).toFixed(2);
+      const total = +(subtotal + shipping + taxes).toFixed(2);
+      
+      // NO generar código aquí, solo preparar para PayPal
+      const tempOrderId = 'TEMP-' + Date.now();
+      
+      initPayPal(total, tempOrderId);
+    }
+
+    // Manejar submit del formulario de checkout
+    const checkoutForm = document.getElementById('checkoutForm');
+    if(checkoutForm) {
+      checkoutForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const paymentMethod = document.getElementById('paymentMethod').value;
+      
+      if(!paymentMethod){
+        alert('Selecciona un método de pago');
+        return;
+      }
+      
+      // Validar campos básicos
+      const name = document.getElementById('cfName').value.trim();
+      const email = document.getElementById('cfEmail').value.trim();
+      const address = document.getElementById('cfAddress').value.trim();
+      
+      if(!name || !email || !address){
+        alert('Por favor, completa todos los campos del formulario');
+        return;
+      }
+      
+      if(paymentMethod === 'paypal'){
+        // Si es PayPal, el pago se maneja en el callback de PayPal
+        alert('Por favor, completa el pago con PayPal usando el botón de arriba.');
+        return;
+      }
+      
+      if(paymentMethod === 'tarjeta'){
+        // Mostrar formulario de tarjeta
+        hideElement('checkoutArea');
+        const cardForm = document.getElementById('cardPaymentForm');
+        if(cardForm) {
+          cardForm.style.display = 'block';
+          cardForm.style.visibility = 'visible';
+          cardForm.classList.remove('hidden');
+          cardForm.removeAttribute('aria-hidden');
+          setTimeout(() => document.getElementById('cardHolderName').focus(), 50);
+        }
+        return;
+      }
+      
+      // Para efectivo, procesar directamente
+      processConfirmedOrder(paymentMethod);
+      });
+    }
+    
+    // Formatear número de tarjeta (agregar espacios cada 4 dígitos)
+    const cardNumberInput = document.getElementById('cardNumber');
+    if(cardNumberInput) {
+      cardNumberInput.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+        let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+        if(formattedValue.length > 19) formattedValue = formattedValue.substr(0, 19);
+        e.target.value = formattedValue;
+      });
+    }
+    
+    // Formatear fecha de expiración (MM/AA)
+    const cardExpiryInput = document.getElementById('cardExpiry');
+    if(cardExpiryInput) {
+      cardExpiryInput.addEventListener('input', (e) => {
+        let value = e.target.value.replace(/\D/g, '');
+        if(value.length >= 2) {
+          value = value.substring(0, 2) + '/' + value.substring(2, 4);
+        }
+        e.target.value = value;
+      });
+    }
+    
+    // Solo números para CVV
+    const cardCVVInput = document.getElementById('cardCVV');
+    if(cardCVVInput) {
+      cardCVVInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/\D/g, '');
+      });
+    }
+    
+    // Manejar submit del formulario de tarjeta
+    const cardPaymentFormElement = document.getElementById('cardPaymentFormElement');
+    if(cardPaymentFormElement) {
+      cardPaymentFormElement.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const cardHolderName = document.getElementById('cardHolderName').value.trim();
+      const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
+      const cardExpiry = document.getElementById('cardExpiry').value;
+      const cardCVV = document.getElementById('cardCVV').value;
+      
+      // Validaciones básicas
+      if(!cardHolderName){
+        alert('Ingresa el nombre del titular de la tarjeta');
+        return;
+      }
+      
+      if(cardNumber.length < 13 || cardNumber.length > 19){
+        alert('El número de tarjeta debe tener entre 13 y 19 dígitos');
+        return;
+      }
+      
+      if(!/^\d{2}\/\d{2}$/.test(cardExpiry)){
+        alert('Ingresa una fecha de expiración válida (MM/AA)');
+        return;
+      }
+      
+      if(cardCVV.length < 3 || cardCVV.length > 4){
+        alert('El CVV debe tener 3 o 4 dígitos');
+        return;
+      }
+      
+      // Simular procesamiento del pago
+      // NO guardamos los datos de la tarjeta, solo el nombre del titular
+      const cardHolderNameOnly = cardHolderName;
+      
+      // Procesar el pedido con el método de pago tarjeta
+      // Pasamos el nombre del titular como información adicional
+      // La función processConfirmedOrder se encargará de ocultar y limpiar el formulario
+      processConfirmedOrder('tarjeta', null, cardHolderNameOnly);
+      });
+    }
+    
+    // Botón volver del formulario de tarjeta
+    const backToCheckoutBtn = document.getElementById('backToCheckout');
+    if(backToCheckoutBtn) {
+      backToCheckoutBtn.addEventListener('click', () => {
+        hideElement('cardPaymentForm');
+        showElement('checkoutArea');
+        // Limpiar formulario de tarjeta
+        const cardFormElement = document.getElementById('cardPaymentFormElement');
+        if(cardFormElement) {
+          cardFormElement.reset();
+        }
+      });
+    }
+
+    // Actualizar PayPal cuando los campos estén completos y el método sea PayPal
+    let paypalInitTimeout = null;
+    const checkoutFormForInput = document.getElementById('checkoutForm');
+    if(checkoutFormForInput) {
+      checkoutFormForInput.addEventListener('input', () => {
+      const paymentMethod = document.getElementById('paymentMethod').value;
+      
+      // Solo actualizar PayPal si el método seleccionado es PayPal
+      if(paymentMethod !== 'paypal'){
+        return;
+      }
+      
+      const name = document.getElementById('cfName').value.trim();
+      const email = document.getElementById('cfEmail').value.trim();
+      const address = document.getElementById('cfAddress').value.trim();
+      
+      // Limpiar timeout anterior
+      if(paypalInitTimeout) clearTimeout(paypalInitTimeout);
+      
+      if(name && email && address){
+        // Esperar un momento antes de inicializar PayPal para evitar múltiples inicializaciones
+        paypalInitTimeout = setTimeout(() => {
+          // Limpiar PayPal anterior
+          if(paypalButtons) {
+            try {
+              paypalButtons.close();
+            } catch(e) {}
+            paypalButtons = null;
+          }
+          document.getElementById('paypal-button-container').innerHTML = '';
+          
+          // Inicializar PayPal
+          initPayPalForCheckout();
+        }, 300);
+      } else {
+          // Limpiar PayPal si los campos no están completos
+        document.getElementById('paypal-button-container').innerHTML = '';
+        hideElement('paypal-button-container');
+        if(paypalButtons) {
+          try {
+            paypalButtons.close();
+          } catch(e) {}
+          paypalButtons = null;
+        }
+      }
+      });
+    }
 
     // Contact form (simulado)
-    document.getElementById('contactForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      alert('Mensaje enviado (simulado). Gracias por escribirnos.');
-      document.getElementById('contactForm').reset();
-    });
+    const contactForm = document.getElementById('contactForm');
+    if(contactForm) {
+      contactForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Mensaje enviado (simulado). Gracias por escribirnos.');
+        contactForm.reset();
+      });
+    }
 
     // Visualizar producto (detalle simple)
     function viewProduct(id){
@@ -603,7 +1825,7 @@
       container.innerHTML = html;
       navigate('productos');
     }
-
+    
     function saveProductReview(e,id){
       e.preventDefault();
       const name = document.getElementById('name_'+id).value.trim();
@@ -617,18 +1839,21 @@
     }
 
     // ====== Reseñas de la página principal ======
-    document.getElementById('homeReviewForm').addEventListener('submit', e=>{
-      e.preventDefault();
-      const name = document.getElementById('homeUser').value.trim();
-      const comment = document.getElementById('homeComment').value.trim();
-      if(!name || !comment) return;
-      const list = JSON.parse(localStorage.getItem('home_reviews')||'[]');
-      list.push({name, comment});
-      localStorage.setItem('home_reviews', JSON.stringify(list));
-      renderHomeReviews();
-      e.target.reset();
-      updateAllReviewsList();
-    });
+    const homeReviewForm = document.getElementById('homeReviewForm');
+    if(homeReviewForm) {
+      homeReviewForm.addEventListener('submit', e=>{
+        e.preventDefault();
+        const name = document.getElementById('homeUser').value.trim();
+        const comment = document.getElementById('homeComment').value.trim();
+        if(!name || !comment) return;
+        const list = JSON.parse(localStorage.getItem('home_reviews')||'[]');
+        list.push({name, comment});
+        localStorage.setItem('home_reviews', JSON.stringify(list));
+        renderHomeReviews();
+        e.target.reset();
+        updateAllReviewsList();
+      });
+    }
 
     function renderHomeReviews(){
       const list = JSON.parse(localStorage.getItem('home_reviews')||'[]');
@@ -655,45 +1880,80 @@
     }
 
     // ====== Registro / Login (simulado con localStorage) ======
-    document.getElementById('registerForm').addEventListener('submit', e=>{
-      e.preventDefault();
-      const name = document.getElementById('regName').value.trim();
-      const email = document.getElementById('regEmail').value.trim();
-      const pass = document.getElementById('regPass').value.trim();
-      if(!name || !email || !pass) return alert('Completa todos los campos');
-      localStorage.setItem('user', JSON.stringify({name, email, pass}));
-      alert('Cuenta creada correctamente.');
-      e.target.reset();
-    });
+    const registerForm = document.getElementById('registerForm');
+    if(registerForm) {
+      registerForm.addEventListener('submit', e=>{
+        e.preventDefault();
+        const name = document.getElementById('regName').value.trim();
+        const email = document.getElementById('regEmail').value.trim();
+        const pass = document.getElementById('regPass').value.trim();
+        if(!name || !email || !pass) return alert('Completa todos los campos');
+        localStorage.setItem('user', JSON.stringify({name, email, pass}));
+        alert('Cuenta creada correctamente.');
+        e.target.reset();
+      });
+    }
 
-    document.getElementById('loginForm').addEventListener('submit', e=>{
-      e.preventDefault();
-      const email = document.getElementById('logEmail').value.trim();
-      const pass = document.getElementById('logPass').value.trim();
-      const u = JSON.parse(localStorage.getItem('user'));
-      if(u && u.email === email && u.pass === pass) {
-        alert('Inicio de sesión exitoso, bienvenido ' + u.name);
-      } else {
-        alert('Credenciales incorrectas');
-      }
-    });
+    const loginForm = document.getElementById('loginForm');
+    if(loginForm) {
+      loginForm.addEventListener('submit', e=>{
+        e.preventDefault();
+        const email = document.getElementById('logEmail').value.trim();
+        const pass = document.getElementById('logPass').value.trim();
+        const u = JSON.parse(localStorage.getItem('user'));
+        if(u && u.email === email && u.pass === pass) {
+          alert('Inicio de sesión exitoso, bienvenido ' + u.name);
+        } else {
+          alert('Credenciales incorrectas');
+        }
+      });
+    }
 
-    document.getElementById('googleBtn').addEventListener('click', ()=> alert('Inicio de sesión con Google simulado'));
-    document.getElementById('gmailBtn').addEventListener('click', ()=> alert('Inicio de sesión con Gmail simulado'));
+    const googleBtn = document.getElementById('googleBtn');
+    if(googleBtn) {
+      googleBtn.addEventListener('click', ()=> alert('Inicio de sesión con Google simulado'));
+    }
+    const gmailBtn = document.getElementById('gmailBtn');
+    if(gmailBtn) {
+      gmailBtn.addEventListener('click', ()=> alert('Inicio de sesión con Gmail simulado'));
+    }
 
     // helper money duplicate safety
     function money(v){ return '$' + Number(v).toFixed(2); }
 
-    // delegación para botones dinámicos
-    document.addEventListener('click', (e) => {
-      const addBtn = e.target.closest('.add-to-cart');
-      if(addBtn) { addToCart(addBtn.dataset.id, 1); }
-    });
+    // delegación para botones dinámicos - ya está manejado en initBodyClickHandlers()
 
-    // iniciar
-    initViews();
-    navigate('home');
-    updateCartUI();
-  </script>
+    // Inicializar tabindex de elementos focusables en panel oculto
+    function initAccessibility(){
+      const panel = document.getElementById('cartPanel');
+      if(panel && panel.getAttribute('aria-hidden') === 'true'){
+        const focusableElements = panel.querySelectorAll('button, input, select, textarea, a');
+        focusableElements.forEach(el => {
+          if(!el.hasAttribute('tabindex')){
+            el.setAttribute('tabindex', '-1');
+          }
+        });
+      }
+    }
+    
+    // iniciar - esperar a que el DOM esté completamente cargado
+    if(document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeApp);
+    } else {
+      // DOM ya está listo
+      initializeApp();
+    }
+    
+    function initializeApp() {
+      initViews();
+      initNavigation();
+      initBodyClickHandlers();
+      navigate('home');
+      updateCartUI();
+      initAccessibility();
+    }
+    // Fix unclosed element lint: ensure all elements are closed above before script ends
+    // No extra elements are open, so keep structure:
+    </script>
 </body>
 </html>
